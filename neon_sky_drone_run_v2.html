@@ -11,7 +11,6 @@
 #overlay{position:fixed;inset:0;display:grid;place-items:center;background:#0009}.card{width:min(420px,calc(100% - 30px));padding:30px 24px;text-align:center;border-radius:24px;background:#050b1de8;border:1px solid #00eaff66;box-shadow:0 0 60px #00eaff22}.card h1{margin:0 0 8px;font-size:46px;letter-spacing:4px;text-shadow:0 0 20px #00eaff}.card p{color:#a8bad0;margin:0 0 23px}.card button{border:0;border-radius:14px;padding:14px 24px;font-size:17px;font-weight:800;background:linear-gradient(90deg,#00eaff,#8b7cff);color:#02101a}.hint{margin-top:15px;color:#7188a4;font-size:12px}.hidden{display:none!important}
 #barrel-indicator .num{color:#ffbc4a}
 #speed-indicator .num{color:#7eff8b}
-#boost-indicator .num{color:#00eaff}
 </style>
 </head>
 <body>
@@ -19,14 +18,13 @@
 <div id="hud">
  <div class="box"><div class="small">SCORE</div><div class="num" id="score">0</div></div>
  <div class="box" id="speed-indicator"><div class="small">СКОРОСТЬ</div><div class="num" id="speedLvl">×1.00</div></div>
- <div class="box" id="boost-indicator"><div class="small">БУСТ</div><div class="num" id="boostLvl">—</div></div>
  <div class="box" id="barrel-indicator"><div class="small">БОЧКА</div><div class="num" id="barrelCount">0/10</div></div>
  <div class="box"><div class="small">BEST</div><div class="num" id="best">0</div></div>
 </div>
 <div id="overlay"><div class="card">
  <h1 id="title">NEON SKY</h1><p id="subtitle">DRONE RUN</p>
  <button id="start">Взлететь ✈️</button>
- <div class="hint">Тап / клик / Space — вверх<br>Без нажатий — самолёт падает<br>10 кликов = бочка (неуязвимость 3с)<br>Каждые 10 очков = +10% скорости<br>Голубой кристалл (~раз в 30 очков) = +10 очков и ускорение 3с</div>
+ <div class="hint">Тап / клик / Space — вверх<br>Без нажатий — самолёт падает<br>10 кликов = бочка (неуязвимость 3с)<br>Каждые 10 очков = +10% скорости</div>
 </div></div>
 
 <script>
@@ -36,7 +34,6 @@ const overlay=document.getElementById("overlay"),start=document.getElementById("
 const title=document.getElementById("title"),subtitle=document.getElementById("subtitle");
 const barrelCountEl=document.getElementById("barrelCount");
 const speedLvlEl=document.getElementById("speedLvl");
-const boostLvlEl=document.getElementById("boostLvl");
 
 let W,H,DPR=1,last=0,time=0,playing=false,score=0,best=+localStorage.neonSkyBest||0,spawn=0,shake=0;
 bestEl.textContent=best;
@@ -79,87 +76,6 @@ function updateBarrelHUD(){
  }
 }
 
-/* ── Буст-кристалл (голубой светящийся шар) ── */
-let boostOrb=null;                 // {x,y,r,vx}
-let boostThreshold=randomBoostGap(30); // следующий порог очков для спавна
-const playerBoost={active:false,timer:0,duration:3,elapsed:0,mult:1.6};
-let globalSpeedFX=1; // множитель скорости фона/звёзд во время буста
-
-function randomBoostGap(base){
- return base+Math.floor(Math.random()*11-5); // base ± 5, разброс по очкам
-}
-
-function getBoostFactor(){
- if(!playerBoost.active)return 1;
- const rampIn=0.3,fadeOut=0.6;
- const{elapsed,timer,mult}=playerBoost;
- if(elapsed<rampIn)return 1+(mult-1)*(elapsed/rampIn);
- if(timer<fadeOut)return 1+(mult-1)*(timer/fadeOut);
- return mult;
-}
-
-function findSafeBoostY(){
- let bestY=H/2,bestGap=-1;
- for(let i=0;i<25;i++){
-  const y=90+Math.random()*(H-180); // случайная позиция по вертикали
-  let minDist=Infinity;
-  for(const d of drones)minDist=Math.min(minDist,Math.abs(y-d.y));
-  if(minDist>bestGap){bestGap=minDist;bestY=y;}
-  if(minDist>140)return y;
- }
- return bestY;
-}
-
-function spawnBoost(){
- boostOrb={x:W+90,y:findSafeBoostY(),r:32,vx:255};
-}
-
-function updateBoostOrb(dt){
- if(!boostOrb)return;
- boostOrb.x-=boostOrb.vx*dt;
-
- /* избегание дронов в полёте, чтобы не соприкасаться */
- for(const d of drones){
-  const dx=boostOrb.x-d.x,dy=boostOrb.y-d.y;
-  const dist=Math.hypot(dx,dy);
-  const safe=95;
-  if(dist<safe&&dist>0.001){
-   boostOrb.y+=(dy/dist)*((safe-dist)/safe)*220*dt;
-  }
- }
- boostOrb.y=Math.max(50,Math.min(H-50,boostOrb.y));
-
- /* столкновение с самолётом */
- const dx=plane.x-boostOrb.x,dy=plane.y-boostOrb.y;
- if(Math.hypot(dx,dy)<boostOrb.r+16){
-  collectBoost();
-  return;
- }
-
- if(boostOrb.x<-90)boostOrb=null; // пропустили
-}
-
-function collectBoost(){
- score+=10;scoreEl.textContent=score;updateSpeedMultiplier();
- playerBoost.active=true;playerBoost.timer=playerBoost.duration;playerBoost.elapsed=0;
- burst(boostOrb.x,boostOrb.y,"#7cfcff",55);
- boostOrb=null;
-}
-
-function updatePlayerBoost(dt){
- if(playerBoost.active){
-  playerBoost.timer-=dt;playerBoost.elapsed+=dt;
-  if(Math.random()<0.65){
-   particles.push({x:plane.x-20,y:plane.y+(Math.random()-.5)*10,vx:-160-Math.random()*120,vy:(Math.random()-.5)*50,life:.4,max:.4,s:1+Math.random()*3,c:"#00eaff"});
-  }
-  if(playerBoost.timer<=0){
-   playerBoost.active=false;playerBoost.timer=0;playerBoost.elapsed=0;
-  }
- }
- globalSpeedFX=getBoostFactor();
- boostLvlEl.textContent=playerBoost.active?"×"+globalSpeedFX.toFixed(2):"—";
-}
-
 /* ── ресайз ── */
 function resize(){
  DPR=Math.min(devicePixelRatio||1,2);W=innerWidth;H=innerHeight;
@@ -183,11 +99,6 @@ function reset(){
  speedMultiplier=1.0;lastSpeedTier=0;
  speedLvlEl.textContent="×1.00";
  resetBarrel();
- boostOrb=null;
- boostThreshold=randomBoostGap(30);
- playerBoost.active=false;playerBoost.timer=0;playerBoost.elapsed=0;
- globalSpeedFX=1;
- boostLvlEl.textContent="—";
 }
 
 /* ── флап + накопление бочки ── */
@@ -269,7 +180,194 @@ function background(dt){
  ctx.fillStyle=g;ctx.fillRect(0,0,W,H);
 
  for(const s of stars){
-  s.x-=dt*.025*s.v*globalSpeedFX;if(s.x<0)s.x=1;
+  s.x-=dt*.025*s.v;if(s.x<0)s.x=1;
   ctx.globalAlpha=.3+.6*s.v;ctx.fillStyle="#c9fbff";
-  ctx.
-   
+  ctx.beginPath();ctx.arc(s.x*W,s.y*H,s.s*s.v,0,Math.PI*2);ctx.fill();
+ }
+ ctx.globalAlpha=1;
+
+ ctx.strokeStyle="#00eaff18";ctx.lineWidth=1;
+ for(let y=H*.72;y<H;y+=28){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke()}
+}
+
+/* ── рисовка дрона ── */
+function drawDrone(d){
+ const y=d.y+Math.sin(time*2+d.phase)*14;
+ ctx.save();ctx.translate(d.x,y);
+ const glow=d.type===0?"#ff3f91":d.type===1?"#8b7cff":"#00eaff";
+ ctx.shadowBlur=22;ctx.shadowColor=glow;
+
+ ctx.strokeStyle=glow;ctx.lineWidth=3;
+ for(const x of [-24,24]){
+  ctx.beginPath();ctx.moveTo(x,-5);ctx.lineTo(x,5);ctx.stroke();
+  ctx.beginPath();ctx.moveTo(x-10,0);ctx.lineTo(x+10,0);ctx.stroke();
+ }
+
+ ctx.fillStyle="#111a31";ctx.strokeStyle=glow;ctx.lineWidth=2;
+ ctx.beginPath();ctx.roundRect(-27,-12,54,24,7);ctx.fill();ctx.stroke();
+
+ ctx.fillStyle=glow;ctx.beginPath();ctx.arc(0,0,4.5,0,7);ctx.fill();
+ ctx.restore();
+}
+
+/* ── рисовка самолёта (с бочкой) ── */
+function drawPlane(){
+ ctx.save();
+ ctx.translate(plane.x,plane.y);
+
+ let scaleY=1;
+ let topColor="#efffff";
+ let glowColor="#00eaff";
+
+ if(barrelRoll.active){
+  const a=barrelRoll.rollAngle;
+  scaleY=Math.abs(Math.cos(a));
+  const upsideDown=Math.cos(a)<0;
+
+  if(scaleY<0.25){
+   topColor="#ffffff";
+   glowColor="#ffbc4a";
+  }else if(upsideDown){
+   topColor="#ffbc4a";
+   glowColor="#ff6a00";
+  }else{
+   topColor="#efffff";
+   glowColor="#00eaff";
+  }
+ }
+
+ ctx.scale(1,scaleY);
+ ctx.rotate(plane.rot*(1-scaleY*0.6));
+
+ ctx.shadowBlur=25;ctx.shadowColor=glowColor;
+
+ /* пламя */
+ const flame=ctx.createLinearGradient(-42,0,-5,0);
+ flame.addColorStop(0,"transparent");
+ flame.addColorStop(1,barrelRoll.active&&Math.cos(barrelRoll.rollAngle)<0?"#ffbc4a":"#00eaff");
+ ctx.fillStyle=flame;
+ ctx.beginPath();ctx.moveTo(-43,0);ctx.lineTo(-5,-5);ctx.lineTo(-5,5);ctx.closePath();ctx.fill();
+
+ /* фюзеляж */
+ ctx.fillStyle=topColor;
+ ctx.strokeStyle=glowColor;ctx.lineWidth=2;
+ ctx.beginPath();
+ ctx.moveTo(34,0);ctx.lineTo(-9,-9);ctx.lineTo(-24,-22);ctx.lineTo(-21,-5);
+ ctx.lineTo(-36,-1);ctx.lineTo(-21,4);ctx.lineTo(-24,22);ctx.lineTo(-9,9);ctx.closePath();
+ ctx.fill();ctx.stroke();
+
+ /* кабина */
+ ctx.fillStyle="#8b7cff";
+ ctx.beginPath();ctx.ellipse(8,0,8,4,0,0,7);ctx.fill();
+
+ /* брюхо — вид снизу */
+ if(barrelRoll.active&&Math.cos(barrelRoll.rollAngle)<0&&scaleY>0.3){
+  ctx.fillStyle="#3a2a10";
+  ctx.beginPath();ctx.ellipse(2,0,14,2.2,0,0,7);ctx.fill();
+ }
+
+ ctx.restore();
+}
+
+/* ── обновление ── */
+function update(dt){
+ time+=dt;
+
+ /* бочка */
+ if(barrelRoll.active){
+  barrelRoll.timer-=dt;
+  barrelRoll.rollAngle+=barrelRoll.rollSpeed*dt;
+  if(barrelRoll.timer<=0.4){
+   barrelRoll.rollSpeed+=(0-barrelRoll.rollSpeed)*5*dt;
+  }
+  if(barrelRoll.timer<=0){
+   barrelRoll.active=false;
+   barrelRoll.rollAngle=0;
+   barrelRoll.rollSpeed=0;
+   barrelRoll.clicks=0;
+   updateBarrelHUD();
+  }
+ }
+
+ /* физика */
+ plane.vy+=1000*dt;plane.y+=plane.vy*dt;
+ plane.rot=Math.max(-.55,Math.min(.8,plane.vy/700));
+
+ spawn-=dt;
+ if(spawn<=0){
+  addDrone();
+  spawn=Math.max(.72,1.25-score*.006);
+ }
+
+ for(const d of drones){
+  /* скорость дронов с учётом множителя */
+  d.x-=(285+Math.min(score*2,130))*speedMultiplier*dt;
+
+  if(!d.passed&&d.x<plane.x){
+   d.passed=true;score++;scoreEl.textContent=score;
+   updateSpeedMultiplier();                // ← проверка нового тира скорости
+   burst(plane.x,plane.y,"#8b7cff",7);
+  }
+
+  if(!barrelRoll.active&&hit(planeBox(),droneBox(d))){
+   gameOver();return;
+  }
+ }
+
+ drones=drones.filter(d=>d.x>-100);
+
+ if(!barrelRoll.active&&(plane.y<15||plane.y>H-15)){gameOver();return}
+
+ for(const p of particles){
+  p.x+=p.vx*dt;p.y+=p.vy*dt;p.vy+=180*dt;p.life-=dt;
+ }
+ particles=particles.filter(p=>p.life>0);
+}
+
+/* ── рендер ── */
+function draw(){
+ ctx.save();
+
+ if(shake>0){
+  ctx.translate((Math.random()-.5)*shake,(Math.random()-.5)*shake);
+  shake*=.86;if(shake<.1)shake=0;
+ }
+
+ background(.016);
+
+ for(const d of drones)drawDrone(d);
+
+ for(const p of particles){
+  ctx.globalAlpha=Math.max(0,p.life/p.max);
+  ctx.fillStyle=p.c;ctx.shadowBlur=10;ctx.shadowColor=p.c;
+  ctx.beginPath();ctx.arc(p.x,p.y,p.s,0,7);ctx.fill();
+ }
+ ctx.globalAlpha=1;ctx.shadowBlur=0;
+
+ drawPlane();
+
+ /* искры во время бочки */
+ if(barrelRoll.active){
+  const a=barrelRoll.rollAngle;
+  const intensity=Math.abs(Math.sin(a*2))*12;
+  for(let i=0;i<intensity;i++){
+   const ang=Math.random()*Math.PI*2;
+   const dist=20+Math.random()*25;
+   ctx.globalAlpha=.5+Math.random()*.5;
+   ctx.fillStyle="#ffbc4a";ctx.shadowBlur=8;ctx.shadowColor="#ffbc4a";
+   ctx.beginPath();ctx.arc(plane.x+Math.cos(ang)*dist,plane.y+Math.sin(ang)*dist,1+Math.random()*2,0,7);ctx.fill();
+  }
+  ctx.globalAlpha=1;ctx.shadowBlur=0;
+ }
+
+ ctx.restore();
+}
+
+function loop(t){
+ const dt=Math.min(.033,(t-last)/1000||0);last=t;
+ if(playing)update(dt);draw();requestAnimationFrame(loop);
+}
+requestAnimationFrame(loop);
+</script>
+</body>
+</html>
