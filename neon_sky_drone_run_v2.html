@@ -1,0 +1,239 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>NEON SKY</title>
+<style>
+*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#02040c;font-family:Arial,sans-serif}body{touch-action:none}canvas{display:block;width:100%;height:100%}
+#hud{position:fixed;top:15px;left:15px;right:15px;display:flex;justify-content:space-between;pointer-events:none}.box{padding:8px 13px;border:1px solid #00eaff55;border-radius:13px;background:#030a18cc}.small{font-size:10px;letter-spacing:2px;color:#73eaff}.num{font-size:24px;font-weight:800;color:white}
+#overlay{position:fixed;inset:0;display:grid;place-items:center;background:#0009}.card{width:min(420px,calc(100% - 30px));padding:30px 24px;text-align:center;border-radius:24px;background:#050b1de8;border:1px solid #00eaff66;box-shadow:0 0 60px #00eaff22}.card h1{margin:0 0 8px;font-size:46px;letter-spacing:4px;text-shadow:0 0 20px #00eaff}.card p{color:#a8bad0;margin:0 0 23px}.card button{border:0;border-radius:14px;padding:14px 24px;font-size:17px;font-weight:800;background:linear-gradient(90deg,#00eaff,#8b7cff);color:#02101a}.hint{margin-top:15px;color:#7188a4;font-size:12px}.hidden{display:none!important}
+</style>
+</head>
+<body>
+<canvas id="game"></canvas>
+<div id="hud">
+ <div class="box"><div class="small">SCORE</div><div class="num" id="score">0</div></div>
+ <div class="box"><div class="small">BEST</div><div class="num" id="best">0</div></div>
+</div>
+<div id="overlay"><div class="card">
+ <h1 id="title">NEON SKY</h1><p id="subtitle">DRONE RUN</p>
+ <button id="start">Взлететь ✈️</button>
+ <div class="hint">Тап / клик / Space — вверх<br>Без нажатий — самолёт падает</div>
+</div></div>
+
+<script>
+const canvas=document.getElementById("game"),ctx=canvas.getContext("2d");
+const scoreEl=document.getElementById("score"),bestEl=document.getElementById("best");
+const overlay=document.getElementById("overlay"),start=document.getElementById("start");
+const title=document.getElementById("title"),subtitle=document.getElementById("subtitle");
+
+let W,H,DPR=1,last=0,time=0,playing=false,score=0,best=+localStorage.neonSkyBest||0,spawn=0,shake=0;
+bestEl.textContent=best;
+
+function resize(){
+ DPR=Math.min(devicePixelRatio||1,2);W=innerWidth;H=innerHeight;
+ canvas.width=W*DPR;canvas.height=H*DPR;ctx.setTransform(DPR,0,0,DPR,0,0);
+}
+addEventListener("resize",resize);resize();
+
+const plane={x:0,y:0,vy:0,rot:0};
+
+/* Самолётная hitbox меньше картинки — столкновение не происходит "издалека". */
+function planeBox(){
+ return {l:plane.x-17,r:plane.x+17,t:plane.y-8,b:plane.y+8};
+}
+
+let drones=[],particles=[];
+const stars=Array.from({length:150},()=>({x:Math.random(),y:Math.random(),s:.4+Math.random()*1.7,v:.2+Math.random()*.8}));
+
+function reset(){
+ score=0;scoreEl.textContent=0;drones=[];particles=[];time=0;spawn=.9;shake=0;
+ plane.x=W*.22;plane.y=H*.5;plane.vy=0;plane.rot=0;
+}
+
+function flap(){
+ if(!playing)return;
+ plane.vy=-430;
+ for(let i=0;i<5;i++)particles.push({x:plane.x-18,y:plane.y,vx:-80-Math.random()*80,vy:(Math.random()-.5)*70,life:.35,max:.35,s:1+Math.random()*3,c:"#00eaff"});
+}
+
+function addDrone(){
+ /*
+  Каждый drone — ОДНО препятствие.
+  Он не создаёт огромные невидимые стены.
+  У дрона есть маленькая реальная hitbox.
+ */
+ const margin=85;
+ const y=margin+Math.random()*(H-margin*2);
+ const type=Math.floor(Math.random()*3);
+ drones.push({
+   x:W+70,y,
+   type,
+   w:58,h:32,
+   hitW:22,hitH:10,
+   phase:Math.random()*6.28,
+   passed:false
+ });
+}
+
+function droneBox(d){
+ const y=d.y+Math.sin(time*2+d.phase)*14;
+ return {l:d.x-d.hitW,r:d.x+d.hitW,t:y-d.hitH,b:y+d.hitH};
+}
+
+function hit(a,b){
+ return a.l<b.r&&a.r>b.l&&a.t<b.b&&a.b>b.t;
+}
+
+function burst(x,y,color="#ff3f91",n=40){
+ for(let i=0;i<n;i++)particles.push({x,y,vx:(Math.random()-.5)*400,vy:(Math.random()-.5)*400,life:.4+Math.random()*.7,max:1,s:1+Math.random()*4,c:color});
+}
+
+function gameOver(){
+ playing=false;shake=13;burst(plane.x,plane.y);
+ if(score>best){best=score;localStorage.neonSkyBest=best;bestEl.textContent=best}
+ title.textContent="MISSION FAILED";subtitle.textContent=`Счёт: ${score} • Рекорд: ${best}`;
+ start.textContent="Повторить ✈️";overlay.classList.remove("hidden");
+}
+
+function begin(){
+ reset();playing=true;overlay.classList.add("hidden");
+}
+
+start.onclick=begin;
+addEventListener("pointerdown",e=>{if(overlay.classList.contains("hidden"))flap()},{passive:true});
+addEventListener("keydown",e=>{
+ if(["Space","ArrowUp","KeyW"].includes(e.code)){
+  e.preventDefault();playing?flap():begin();
+ }
+});
+
+function background(dt){
+ const g=ctx.createLinearGradient(0,0,0,H);
+ g.addColorStop(0,"#020516");g.addColorStop(.55,"#07142d");g.addColorStop(1,"#02030a");
+ ctx.fillStyle=g;ctx.fillRect(0,0,W,H);
+
+ for(const s of stars){
+  s.x-=dt*.025*s.v;if(s.x<0)s.x=1;
+  ctx.globalAlpha=.3+.6*s.v;ctx.fillStyle="#c9fbff";
+  ctx.beginPath();ctx.arc(s.x*W,s.y*H,s.s*s.v,0,Math.PI*2);ctx.fill();
+ }
+ ctx.globalAlpha=1;
+
+ /* неоновая линия горизонта */
+ ctx.strokeStyle="#00eaff18";ctx.lineWidth=1;
+ for(let y=H*.72;y<H;y+=28){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke()}
+}
+
+function drawDrone(d){
+ const y=d.y+Math.sin(time*2+d.phase)*14;
+ ctx.save();ctx.translate(d.x,y);
+ const glow=d.type===0?"#ff3f91":d.type===1?"#8b7cff":"#00eaff";
+ ctx.shadowBlur=22;ctx.shadowColor=glow;
+
+ /* пропеллеры */
+ ctx.strokeStyle=glow;ctx.lineWidth=3;
+ for(const x of [-24,24]){
+  ctx.beginPath();ctx.moveTo(x,-5);ctx.lineTo(x,5);ctx.stroke();
+  ctx.beginPath();ctx.moveTo(x-10,0);ctx.lineTo(x+10,0);ctx.stroke();
+ }
+
+ ctx.fillStyle="#111a31";ctx.strokeStyle=glow;ctx.lineWidth=2;
+ ctx.beginPath();ctx.roundRect(-27,-12,54,24,7);ctx.fill();ctx.stroke();
+
+ ctx.fillStyle=glow;ctx.beginPath();ctx.arc(0,0,4.5,0,7);ctx.fill();
+ ctx.restore();
+}
+
+function drawPlane(){
+ ctx.save();ctx.translate(plane.x,plane.y);ctx.rotate(plane.rot);
+ ctx.shadowBlur=25;ctx.shadowColor="#00eaff";
+
+ const flame=ctx.createLinearGradient(-42,0,-5,0);
+ flame.addColorStop(0,"transparent");flame.addColorStop(1,"#00eaff");
+ ctx.fillStyle=flame;ctx.beginPath();ctx.moveTo(-43,0);ctx.lineTo(-5,-5);ctx.lineTo(-5,5);ctx.closePath();ctx.fill();
+
+ ctx.fillStyle="#efffff";ctx.strokeStyle="#00eaff";ctx.lineWidth=2;
+ ctx.beginPath();
+ ctx.moveTo(34,0);ctx.lineTo(-9,-9);ctx.lineTo(-24,-22);ctx.lineTo(-21,-5);
+ ctx.lineTo(-36,-1);ctx.lineTo(-21,4);ctx.lineTo(-24,22);ctx.lineTo(-9,9);ctx.closePath();
+ ctx.fill();ctx.stroke();
+
+ ctx.fillStyle="#8b7cff";ctx.beginPath();ctx.ellipse(8,0,8,4,0,0,7);ctx.fill();
+ ctx.restore();
+}
+
+function update(dt){
+ time+=dt;
+
+ /* физика: нажатие даёт импульс вверх, потом самолёт падает */
+ plane.vy+=1000*dt;plane.y+=plane.vy*dt;
+ plane.rot=Math.max(-.55,Math.min(.8,plane.vy/700));
+
+ spawn-=dt;
+ if(spawn<=0){
+  addDrone();
+  spawn=Math.max(.72,1.25-score*.006);
+ }
+
+ for(const d of drones){
+  /* препятствия двигаются НА ИГРОКА — игрок должен уворачиваться */
+  d.x-=(285+Math.min(score*2,130))*dt;
+
+  if(!d.passed&&d.x<plane.x){
+   d.passed=true;score++;scoreEl.textContent=score;
+   burst(plane.x,plane.y,"#8b7cff",7);
+  }
+
+  /*
+   * Реальная проверка столкновения:
+   * самолёт должен физически пересечься с маленькой hitbox дрона.
+   * Просто пролететь рядом — безопасно.
+   */
+  if(hit(planeBox(),droneBox(d))){
+   gameOver();return;
+  }
+ }
+
+ drones=drones.filter(d=>d.x>-100);
+
+ if(plane.y<15||plane.y>H-15){gameOver();return}
+
+ for(const p of particles){
+  p.x+=p.vx*dt;p.y+=p.vy*dt;p.vy+=180*dt;p.life-=dt;
+ }
+ particles=particles.filter(p=>p.life>0);
+}
+
+function draw(){
+ ctx.save();
+
+ if(shake>0){
+  ctx.translate((Math.random()-.5)*shake,(Math.random()-.5)*shake);
+  shake*=.86;if(shake<.1)shake=0;
+ }
+
+ background(.016);
+
+ for(const d of drones)drawDrone(d);
+
+ for(const p of particles){
+  ctx.globalAlpha=Math.max(0,p.life/p.max);
+  ctx.fillStyle=p.c;ctx.shadowBlur=10;ctx.shadowColor=p.c;
+  ctx.beginPath();ctx.arc(p.x,p.y,p.s,0,7);ctx.fill();
+ }
+ ctx.globalAlpha=1;ctx.shadowBlur=0;
+
+ drawPlane();
+ ctx.restore();
+}
+
+function loop(t){
+ const dt=Math.min(.033,(t-last)/1000||0);last=t;
+ if(playing)update(dt);draw();requestAnimationFrame(loop);
+}
+requestAnimationFrame(loop);
+</script>
+</body>
+</html>
