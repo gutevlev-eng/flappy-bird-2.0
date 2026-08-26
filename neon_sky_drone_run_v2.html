@@ -9,24 +9,22 @@
 #hud{position:fixed;top:15px;left:15px;right:15px;display:flex;justify-content:space-between;pointer-events:none;gap:8px;flex-wrap:wrap}
 .box{padding:8px 13px;border:1px solid #00eaff55;border-radius:13px;background:#030a18cc}.small{font-size:10px;letter-spacing:2px;color:#73eaff}.num{font-size:24px;font-weight:800;color:white}
 #overlay{position:fixed;inset:0;display:grid;place-items:center;background:#0009}.card{width:min(420px,calc(100% - 30px));padding:30px 24px;text-align:center;border-radius:24px;background:#050b1de8;border:1px solid #00eaff66;box-shadow:0 0 60px #00eaff22}.card h1{margin:0 0 8px;font-size:46px;letter-spacing:4px;text-shadow:0 0 20px #00eaff}.card p{color:#a8bad0;margin:0 0 23px}.card button{border:0;border-radius:14px;padding:14px 24px;font-size:17px;font-weight:800;background:linear-gradient(90deg,#00eaff,#8b7cff);color:#02101a}.hint{margin-top:15px;color:#7188a4;font-size:12px}.hidden{display:none!important}
-#barrel-indicator{transition:all .25s}
 #barrel-indicator .num{color:#ffbc4a}
-#barrel-active{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);font-size:38px;font-weight:900;letter-spacing:6px;color:#ffbc4a;text-shadow:0 0 40px #ffbc4a,0 0 80px #ff6a00;pointer-events:none;opacity:0;transition:opacity .15s}
-#barrel-active.show{opacity:1}
+#speed-indicator .num{color:#7eff8b}
 </style>
 </head>
 <body>
 <canvas id="game"></canvas>
 <div id="hud">
  <div class="box"><div class="small">SCORE</div><div class="num" id="score">0</div></div>
+ <div class="box" id="speed-indicator"><div class="small">СКОРОСТЬ</div><div class="num" id="speedLvl">×1.00</div></div>
  <div class="box" id="barrel-indicator"><div class="small">БОЧКА</div><div class="num" id="barrelCount">0/10</div></div>
  <div class="box"><div class="small">BEST</div><div class="num" id="best">0</div></div>
 </div>
-<div id="barrel-active">🌀 БОЧКА!</div>
 <div id="overlay"><div class="card">
  <h1 id="title">NEON SKY</h1><p id="subtitle">DRONE RUN</p>
  <button id="start">Взлететь ✈️</button>
- <div class="hint">Тап / клик / Space — вверх<br>Без нажатий — самолёт падает<br>10 кликов = бочка (неуязвимость 3с)</div>
+ <div class="hint">Тап / клик / Space — вверх<br>Без нажатий — самолёт падает<br>10 кликов = бочка (неуязвимость 3с)<br>Каждые 10 очков = +10% скорости</div>
 </div></div>
 
 <script>
@@ -35,35 +33,46 @@ const scoreEl=document.getElementById("score"),bestEl=document.getElementById("b
 const overlay=document.getElementById("overlay"),start=document.getElementById("start");
 const title=document.getElementById("title"),subtitle=document.getElementById("subtitle");
 const barrelCountEl=document.getElementById("barrelCount");
-const barrelActiveEl=document.getElementById("barrel-active");
+const speedLvlEl=document.getElementById("speedLvl");
 
 let W,H,DPR=1,last=0,time=0,playing=false,score=0,best=+localStorage.neonSkyBest||0,spawn=0,shake=0;
 bestEl.textContent=best;
 
+/* ── Скорость дронов: +10% каждые 10 очков (сложный процент) ── */
+let speedMultiplier=1.0;       // 1.0 = базовая скорость
+let lastSpeedTier=0;           // последний «порог», при котором обновляли множитель
+
+function updateSpeedMultiplier(){
+ const tier=Math.floor(score/10);           // каждые 10 очков — новый тир
+ if(tier>lastSpeedTier){
+  speedMultiplier=Math.pow(1.10,tier);      // сложный процент: 1.1^tier
+  lastSpeedTier=tier;
+  speedLvlEl.textContent="×"+speedMultiplier.toFixed(2);
+ }
+}
+
 /* ── Бочка ── */
 const barrelRoll={
- active:false,        // бочка прямо сейчас?
- timer:0,             // сколько осталось (сек)
- duration:3,          // длительность бочки
- clicks:0,            // накоплено кликов
- needed:10,           // сколько нужно для активации
- rollAngle:0,         // текущий угол вращения (радианы)
- rollSpeed:0          // скорость вращения
+ active:false,
+ timer:0,
+ duration:3,
+ clicks:0,
+ needed:10,
+ rollAngle:0,
+ rollSpeed:0
 };
 
 function resetBarrel(){
  barrelRoll.active=false;barrelRoll.timer=0;
  barrelRoll.clicks=0;barrelRoll.rollAngle=0;barrelRoll.rollSpeed=0;
  barrelCountEl.textContent="0/10";
- barrelActiveEl.classList.remove("show");
 }
 
 function updateBarrelHUD(){
- barrelCountEl.textContent=barrelRoll.clicks+"/"+barrelRoll.needed;
- if(barrelRoll.clicks>=barrelRoll.needed){
-  barrelCountEl.style.color="#ffbc4a";
+ if(barrelRoll.active){
+  barrelCountEl.textContent="АКТИВ!";
  }else{
-  barrelCountEl.style.color="";
+  barrelCountEl.textContent=barrelRoll.clicks+"/"+barrelRoll.needed;
  }
 }
 
@@ -87,6 +96,8 @@ const stars=Array.from({length:150},()=>({x:Math.random(),y:Math.random(),s:.4+M
 function reset(){
  score=0;scoreEl.textContent=0;drones=[];particles=[];time=0;spawn=.9;shake=0;
  plane.x=W*.22;plane.y=H*.5;plane.vy=0;plane.rot=0;
+ speedMultiplier=1.0;lastSpeedTier=0;
+ speedLvlEl.textContent="×1.00";
  resetBarrel();
 }
 
@@ -96,7 +107,6 @@ function flap(){
  plane.vy=-430;
  for(let i=0;i<5;i++)particles.push({x:plane.x-18,y:plane.y,vx:-80-Math.random()*80,vy:(Math.random()-.5)*70,life:.35,max:.35,s:1+Math.random()*3,c:"#00eaff"});
 
- /* накопление кликов для бочки */
  if(!barrelRoll.active){
   barrelRoll.clicks++;
   updateBarrelHUD();
@@ -111,10 +121,8 @@ function activateBarrel(){
  barrelRoll.active=true;
  barrelRoll.timer=barrelRoll.duration;
  barrelRoll.clicks=0;
- barrelRoll.rollSpeed=Math.PI*2*3.5;  // ~3.5 полных оборота в секунду
- barrelActiveEl.classList.add("show");
- barrelCountEl.textContent="АКТИВ!";
- barrelCountEl.style.color="#ffbc4a";
+ barrelRoll.rollSpeed=Math.PI*2*3.5;
+ updateBarrelHUD();
 }
 
 /* ── дроны ── */
@@ -151,7 +159,6 @@ function gameOver(){
  if(score>best){best=score;localStorage.neonSkyBest=best;bestEl.textContent=best}
  title.textContent="MISSION FAILED";subtitle.textContent=`Счёт: ${score} • Рекорд: ${best}`;
  start.textContent="Повторить ✈️";overlay.classList.remove("hidden");
- barrelActiveEl.classList.remove("show");
 }
 
 function begin(){
@@ -208,34 +215,29 @@ function drawPlane(){
  ctx.save();
  ctx.translate(plane.x,plane.y);
 
- /* если активна бочка — применяем roll-трансформацию */
  let scaleY=1;
- let topColor="#efffff", bottomColor="#ffbc4a";  // нормальный вид / вид снизу
+ let topColor="#efffff";
  let glowColor="#00eaff";
 
  if(barrelRoll.active){
   const a=barrelRoll.rollAngle;
-  scaleY=Math.abs(Math.cos(a));          // сжатие по вертикали: 0 = вид сбоку, 1 = вид сверху/снизу
-  const upsideDown=Math.cos(a)<0;        // true = вид снизу (брюхо вверх)
+  scaleY=Math.abs(Math.cos(a));
+  const upsideDown=Math.cos(a)<0;
 
   if(scaleY<0.25){
-   // вид почти сбоку — очень тонкий, яркая полоса
    topColor="#ffffff";
    glowColor="#ffbc4a";
   }else if(upsideDown){
-   // вид снизу — брюхо самолёта
    topColor="#ffbc4a";
-   bottomColor="#efffff";
    glowColor="#ff6a00";
   }else{
-   // вид сверху — нормальный
    topColor="#efffff";
    glowColor="#00eaff";
   }
  }
 
  ctx.scale(1,scaleY);
- ctx.rotate(plane.rot*(1-scaleY*0.6));  // уменьшаем pitch-rotation когда сжат
+ ctx.rotate(plane.rot*(1-scaleY*0.6));
 
  ctx.shadowBlur=25;ctx.shadowColor=glowColor;
 
@@ -258,7 +260,7 @@ function drawPlane(){
  ctx.fillStyle="#8b7cff";
  ctx.beginPath();ctx.ellipse(8,0,8,4,0,0,7);ctx.fill();
 
- /* если вид снизу — рисуем «брюхо» (тёмная полоса по центру) */
+ /* брюхо — вид снизу */
  if(barrelRoll.active&&Math.cos(barrelRoll.rollAngle)<0&&scaleY>0.3){
   ctx.fillStyle="#3a2a10";
   ctx.beginPath();ctx.ellipse(2,0,14,2.2,0,0,7);ctx.fill();
@@ -271,20 +273,18 @@ function drawPlane(){
 function update(dt){
  time+=dt;
 
- /* обновление бочки */
+ /* бочка */
  if(barrelRoll.active){
   barrelRoll.timer-=dt;
   barrelRoll.rollAngle+=barrelRoll.rollSpeed*dt;
-  // плавно затухаем в конце
   if(barrelRoll.timer<=0.4){
-   barrelRoll.rollSpeed+=(0-barrelRoll.rollSpeed)*5*dt; // замедление
+   barrelRoll.rollSpeed+=(0-barrelRoll.rollSpeed)*5*dt;
   }
   if(barrelRoll.timer<=0){
    barrelRoll.active=false;
    barrelRoll.rollAngle=0;
    barrelRoll.rollSpeed=0;
    barrelRoll.clicks=0;
-   barrelActiveEl.classList.remove("show");
    updateBarrelHUD();
   }
  }
@@ -300,14 +300,15 @@ function update(dt){
  }
 
  for(const d of drones){
-  d.x-=(285+Math.min(score*2,130))*dt;
+  /* скорость дронов с учётом множителя */
+  d.x-=(285+Math.min(score*2,130))*speedMultiplier*dt;
 
   if(!d.passed&&d.x<plane.x){
    d.passed=true;score++;scoreEl.textContent=score;
+   updateSpeedMultiplier();                // ← проверка нового тира скорости
    burst(plane.x,plane.y,"#8b7cff",7);
   }
 
-  /* столкновение: если бочка активна — неуязвимость */
   if(!barrelRoll.active&&hit(planeBox(),droneBox(d))){
    gameOver();return;
   }
@@ -315,7 +316,6 @@ function update(dt){
 
  drones=drones.filter(d=>d.x>-100);
 
- /* если бочка активна — границы не убивают */
  if(!barrelRoll.active&&(plane.y<15||plane.y>H-15)){gameOver();return}
 
  for(const p of particles){
@@ -335,13 +335,6 @@ function draw(){
 
  background(.016);
 
- /* при бочке — лёгкая вспышка фона */
- if(barrelRoll.active){
-  const intensity=Math.abs(Math.cos(barrelRoll.rollAngle))*0.04;
-  ctx.fillStyle=`rgba(255,188,74,${intensity})`;
-  ctx.fillRect(0,0,W,H);
- }
-
  for(const d of drones)drawDrone(d);
 
  for(const p of particles){
@@ -353,7 +346,7 @@ function draw(){
 
  drawPlane();
 
- /* частицы искр вокруг самолёта во время бочки */
+ /* искры во время бочки */
  if(barrelRoll.active){
   const a=barrelRoll.rollAngle;
   const intensity=Math.abs(Math.sin(a*2))*12;
@@ -370,7 +363,6 @@ function draw(){
  ctx.restore();
 }
 
-/* ── главный цикл ── */
 function loop(t){
  const dt=Math.min(.033,(t-last)/1000||0);last=t;
  if(playing)update(dt);draw();requestAnimationFrame(loop);
