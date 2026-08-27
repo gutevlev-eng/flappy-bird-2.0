@@ -10,7 +10,7 @@
 .box{padding:8px 13px;border:1px solid #00eaff55;border-radius:13px;background:#030a18cc}.small{font-size:10px;letter-spacing:2px;color:#73eaff}.num{font-size:24px;font-weight:800;color:white}
 #coin-indicator{border-color:#ffd60055}#coin-indicator .num{color:#ffd600;text-shadow:0 0 10px #ffd60088}
 #overlay{position:fixed;inset:0;display:grid;place-items:center;background:#0009;backdrop-filter:blur(2px)}
-.card{width:min(460px,calc(100% - 30px));max-height:92vh;overflow-y:auto;padding:26px 22px;text-align:center;border-radius:24px;background:#050b1de8;border:1px solid #00eaff66;box-shadow:0 0 60px #00eaff22}
+.card{width:min(440px,calc(100% - 30px));max-height:92vh;overflow-y:auto;padding:26px 22px;text-align:center;border-radius:24px;background:#050b1de8;border:1px solid #00eaff66;box-shadow:0 0 60px #00eaff22}
 .card::-webkit-scrollbar{width:6px}.card::-webkit-scrollbar-thumb{background:#00eaff55;border-radius:6px}
 .card h1{margin:0 0 4px;font-size:44px;letter-spacing:4px;text-shadow:0 0 20px #00eaff}
 .card h2.shopTitle{margin:4px 0 6px;font-size:20px;letter-spacing:3px;color:#8fe9ff;text-shadow:0 0 14px #00eaff88}
@@ -21,8 +21,8 @@
 .hint{margin-top:15px;color:#7188a4;font-size:12px;line-height:1.6}
 .hidden{display:none!important}
 
-.tabs{display:flex;gap:7px;margin-bottom:20px}
-.tab-btn{flex:1;padding:11px 4px;border-radius:12px;border:1px solid #00eaff33;background:#0a1526;color:#8fe9ff;font-weight:800;letter-spacing:1px;font-size:11px;cursor:pointer;transition:all .25s ease}
+.tabs{display:flex;gap:8px;margin-bottom:20px}
+.tab-btn{flex:1;padding:11px 6px;border-radius:12px;border:1px solid #00eaff33;background:#0a1526;color:#8fe9ff;font-weight:800;letter-spacing:1.5px;font-size:12.5px;cursor:pointer;transition:all .25s ease}
 .tab-btn:hover{border-color:#00eaff88;color:#c9f8ff}
 .tab-btn.active{background:linear-gradient(90deg,#00eaff,#8b7cff);color:#02101a;box-shadow:0 0 18px #00eaff77;border-color:transparent}
 .panel{animation:fadeIn .3s ease}
@@ -49,22 +49,7 @@
 .colorCard.selected .check{opacity:1;transform:scale(1)}
 .colorCard .lockIcon{position:absolute;top:6px;right:9px;font-size:11px;opacity:.6}
 
-.bgGrid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-top:4px}
-.bgCard{position:relative;padding:14px 8px 12px;border-radius:16px;border:1.5px solid #ffffff1a;background:#0b1830;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:8px;transition:transform .18s ease,box-shadow .25s ease,border-color .25s ease}
-.bgCard:hover{transform:translateY(-4px);border-color:#00eaff88}
-.bgCard:active{transform:scale(.94)}
-.bgCard.selected{border-color:#ffffffcc;box-shadow:0 0 24px var(--glow,#00eaff),inset 0 0 12px #ffffff11}
-.bgCard.locked{opacity:.85}
-.bgCard.shakeErr{animation:shakeErr .35s}
-.bgPreview{width:100%;height:46px;border-radius:10px;box-shadow:0 0 14px var(--glow,#00eaff) inset,0 0 10px var(--glow,#00eaff)}
-.bgCard.locked .bgPreview{filter:grayscale(.3) brightness(.75)}
-.bgCard .name{font-size:11px;color:#cfe9ff;letter-spacing:.5px;font-weight:700;text-align:center}
-.bgCard .price{font-size:11px;font-weight:800;color:#ffd600;text-shadow:0 0 8px #ffd60077;display:flex;align-items:center;gap:4px}
-.bgCard .price .coinIcon{width:11px;height:11px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#fff6c8,#ffd600 55%,#c99700);box-shadow:0 0 6px #ffd600}
-.bgCard .check{position:absolute;top:6px;right:9px;font-size:13px;color:#7effa0;opacity:0;transform:scale(.5);transition:all .2s ease;text-shadow:0 0 8px #7effa0}
-.bgCard.selected .check{opacity:1;transform:scale(1)}
-.bgCard .lockIcon{position:absolute;top:6px;right:9px;font-size:11px;opacity:.6}
-
+/* всплывающий текст награды за монету */
 .coinPopup{position:fixed;pointer-events:none;font-weight:800;font-size:20px;color:#ffd600;text-shadow:0 0 12px #ffd600,0 0 4px #fff;z-index:50;animation:coinPopUp .8s ease forwards}
 @keyframes coinPopUp{0%{opacity:0;transform:translate(-50%,0) scale(.7)}15%{opacity:1;transform:translate(-50%,-6px) scale(1.15)}100%{opacity:0;transform:translate(-50%,-46px) scale(1)}}
 </style>
@@ -84,8 +69,7 @@
  <div class="card">
   <div class="tabs">
    <button class="tab-btn active" data-tab="main">ГЛАВНОЕ МЕНЮ</button>
-   <button class="tab-btn" data-tab="shop">МАГАЗИН ЦВЕТОВ</button>
-   <button class="tab-btn" data-tab="bg">🌌 ФОНЫ</button>
+   <button class="tab-btn" data-tab="shop">МАГАЗИН</button>
   </div>
 
   <div class="panel" id="panel-main">
@@ -101,13 +85,6 @@
    <div class="colorGrid" id="colorGrid"></div>
    <div class="hint">Белый цвет доступен бесплатно.<br>Остальные цвета — 15 Coins, покупаются навсегда.</div>
   </div>
-
-  <div class="panel hidden" id="panel-bg">
-   <h2 class="shopTitle">ФОНЫ ИГРОВОГО ПОЛЯ</h2>
-   <div class="coinBalance"><div class="coinIcon"></div><span id="coinsBg">0</span> Coins</div>
-   <div class="bgGrid" id="bgGrid"></div>
-   <div class="hint">«Неоновое небо» доступно бесплатно.<br>Остальные фоны — 20 Coins, покупаются навсегда.</div>
-  </div>
  </div>
 </div>
 
@@ -119,7 +96,7 @@ const title=document.getElementById("title"),subtitle=document.getElementById("s
 const barrelCountEl=document.getElementById("barrelCount");
 const speedLvlEl=document.getElementById("speedLvl");
 const turboLvlEl=document.getElementById("turboLvl");
-const coinsHUD=document.getElementById("coinsHUD"),coinsMenu=document.getElementById("coinsMenu"),coinsShop=document.getElementById("coinsShop"),coinsBg=document.getElementById("coinsBg");
+const coinsHUD=document.getElementById("coinsHUD"),coinsMenu=document.getElementById("coinsMenu"),coinsShop=document.getElementById("coinsShop");
 
 let W,H,DPR=1,last=0,time=0,playing=false,score=0,best=+localStorage.neonSkyBest||0,spawn=0,shake=0;
 bestEl.textContent=best;
@@ -130,7 +107,6 @@ function updateCoinsUI(){
  coinsHUD.textContent=coins;
  coinsMenu.textContent=coins;
  coinsShop.textContent=coins;
- coinsBg.textContent=coins;
 }
 function addCoins(n){
  coins+=n;
@@ -214,70 +190,6 @@ function buildColorGrid(){
 }
 buildColorGrid();
 
-/* ══════════════ МАГАЗИН: Фоны ══════════════ */
-const BACKGROUNDS={
- neon:{name:"Неоновое небо",emoji:"🌌",price:0,colors:["#031126","#00eaff"]},
- synth:{name:"Synthwave",emoji:"🌅",price:20,colors:["#ff5f3d","#ff3f9e"]},
- matrix:{name:"Матрица",emoji:"🟩",price:20,colors:["#001a0a","#00ff6a"]},
- ocean:{name:"Океан",emoji:"🌊",price:20,colors:["#003b66","#7ff2ff"]},
- galaxy:{name:"Галактика",emoji:"🪐",price:20,colors:["#1a0a33","#ff3f9e"]}
-};
-let ownedBackgrounds=JSON.parse(localStorage.neonSkyOwnedBackgrounds||'["neon"]');
-if(!ownedBackgrounds.includes("neon"))ownedBackgrounds.push("neon");
-let selectedBackground=localStorage.neonSkyBackground||"neon";
-if(!ownedBackgrounds.includes(selectedBackground))selectedBackground="neon";
-
-function saveOwnedBg(){localStorage.neonSkyOwnedBackgrounds=JSON.stringify(ownedBackgrounds);}
-function saveSelectedBg(){localStorage.neonSkyBackground=selectedBackground;}
-
-function buildBackgroundGrid(){
- const grid=document.getElementById("bgGrid");
- grid.innerHTML="";
- for(const key in BACKGROUNDS){
-  const b=BACKGROUNDS[key];
-  const owned=ownedBackgrounds.includes(key);
-  const card=document.createElement("div");
-  card.className="bgCard"+(key===selectedBackground?" selected":"")+(!owned?" locked":"");
-  card.style.setProperty("--glow",b.colors[1]);
-
-  let bottomHtml;
-  if(owned){
-   bottomHtml=`<div class="name">${b.emoji} ${b.name}</div>`;
-  }else{
-   bottomHtml=`<div class="name">${b.emoji} ${b.name}</div><div class="price"><div class="coinIcon"></div>${b.price}</div>`;
-  }
-
-  card.innerHTML=`<div class="check">✓</div>${!owned?'<div class="lockIcon">🔒</div>':""}<div class="bgPreview" style="background:linear-gradient(135deg,${b.colors[0]},${b.colors[1]})"></div>${bottomHtml}`;
-
-  card.onclick=()=>{
-   const isOwned=ownedBackgrounds.includes(key);
-   if(isOwned){
-    selectedBackground=key;
-    saveSelectedBg();
-    document.querySelectorAll(".bgCard").forEach(el=>el.classList.remove("selected"));
-    card.classList.add("selected");
-   }else{
-    if(coins>=b.price){
-     coins-=b.price;
-     localStorage.neonSkyCoins=coins;
-     updateCoinsUI();
-     ownedBackgrounds.push(key);
-     saveOwnedBg();
-     selectedBackground=key;
-     saveSelectedBg();
-     buildBackgroundGrid();
-    }else{
-     card.classList.remove("shakeErr");
-     void card.offsetWidth;
-     card.classList.add("shakeErr");
-    }
-   }
-  };
-  grid.appendChild(card);
- }
-}
-buildBackgroundGrid();
-
 /* ══════════════ Вкладки меню ══════════════ */
 document.querySelectorAll(".tab-btn").forEach(btn=>{
  btn.onclick=()=>{
@@ -286,7 +198,6 @@ document.querySelectorAll(".tab-btn").forEach(btn=>{
   const tab=btn.dataset.tab;
   document.getElementById("panel-main").classList.toggle("hidden",tab!=="main");
   document.getElementById("panel-shop").classList.toggle("hidden",tab!=="shop");
-  document.getElementById("panel-bg").classList.toggle("hidden",tab!=="bg");
  };
 });
 
@@ -362,11 +273,11 @@ function collectBoost(){
 /* ══════════════ МОНЕТКИ на поле (коллектибл) ══════════════ */
 let coinItem=null;
 let nextCoinScore=0;
-const COIN_VISUAL_R=14;
-const COIN_HITBOX_R=28*1.5;
+const COIN_VISUAL_R=14;          // визуальный размер — НЕ меняем
+const COIN_HITBOX_R=28*1.5;      // хитбокс увеличен в 1.5 раза (было 28)
 
 function scheduleNextCoin(){
- nextCoinScore=score+3+Math.floor(Math.random()*5);
+ nextCoinScore=score+3+Math.floor(Math.random()*5); // 3..7, не меняем
 }
 
 function trySpawnCoinItem(){
@@ -386,11 +297,15 @@ function trySpawnCoinItem(){
  coinItem={x:cx,y:cy,r:COIN_VISUAL_R,spawnT:0,rot:0};
 }
 
+/* награда теперь случайная: от 1 до 3 Coins включительно */
 function collectCoin(){
- const reward=1+Math.floor(Math.random()*3);
+ const reward=1+Math.floor(Math.random()*3); // 1,2 или 3
  addCoins(reward);
+
+ /* всплывающая подсказка с точной наградой, экранные координаты */
  const rect=canvas.getBoundingClientRect();
  showCoinPopup(rect.left+coinItem.x,rect.top+coinItem.y,reward);
+
  burst(coinItem.x,coinItem.y,"#ffd600",22);
  coinItem=null;
  scheduleNextCoin();
@@ -424,8 +339,283 @@ function drawCoinItem(cn){
  ctx.restore();
 }
 
-/* ══════════════ Состояние динамических фонов ══════════════ */
-let bg={neonStars:[],synth:{gridOffset:0},matrixCols:[],bubbles:[],galaxyStars:[]};
+/* ── ресайз ── */
+function resize(){
+ DPR=Math.min(devicePixelRatio||1,2);W=innerWidth;H=innerHeight;
+ canvas.width=W*DPR;canvas.height=H*DPR;ctx.setTransform(DPR,0,0,DPR,0,0);
+}
+addEventListener("resize",resize);resize();
 
-function initBackgroundState(){
- bg.neonStars=
+const plane={x:0,y:0,vy:0,rot:0};
+function planeBox(){return {l:plane.x-17,r:plane.x+17,t:plane.y-8,b:plane.y+8};}
+
+let drones=[],particles=[];
+const stars=Array.from({length:150},()=>({x:Math.random(),y:Math.random(),s:.4+Math.random()*1.7,v:.2+Math.random()*.8}));
+
+function reset(){
+ score=0;scoreEl.textContent=0;drones=[];particles=[];time=0;spawn=.9;shake=0;
+ plane.x=W*.22;plane.y=H*.5;plane.vy=0;plane.rot=0;
+ speedMultiplier=1.0;lastSpeedTier=0;speedLvlEl.textContent="×1.00";
+ resetBarrel();resetBoostSystem();
+ coinItem=null;scheduleNextCoin();
+}
+
+function flap(){
+ if(!playing)return;
+ plane.vy=-430;
+ for(let i=0;i<5;i++)particles.push({x:plane.x-18,y:plane.y,vx:-80-Math.random()*80,vy:(Math.random()-.5)*70,life:.35,max:.35,s:1+Math.random()*3,c:"#00eaff"});
+ if(!barrelRoll.active){
+  barrelRoll.clicks++;updateBarrelHUD();
+  if(barrelRoll.clicks>=barrelRoll.needed)activateBarrel();
+ }
+}
+
+function addDrone(){
+ const margin=85;
+ const y=margin+Math.random()*(H-margin*2);
+ const type=Math.floor(Math.random()*3);
+ drones.push({x:W+70,y,type,w:58,h:32,hitW:22,hitH:10,phase:Math.random()*6.28,passed:false});
+}
+function droneBox(d){
+ const y=d.y+Math.sin(time*2+d.phase)*14;
+ return {l:d.x-d.hitW,r:d.x+d.hitW,t:y-d.hitH,b:y+d.hitH};
+}
+function hit(a,b){return a.l<b.r&&a.r>b.l&&a.t<b.b&&a.b>b.t;}
+
+function burst(x,y,color="#ff3f91",n=40){
+ for(let i=0;i<n;i++)particles.push({x,y,vx:(Math.random()-.5)*400,vy:(Math.random()-.5)*400,life:.4+Math.random()*.7,max:1,s:1+Math.random()*4,c:color});
+}
+
+function gameOver(){
+ playing=false;shake=13;burst(plane.x,plane.y);
+ if(score>best){best=score;localStorage.neonSkyBest=best;bestEl.textContent=best}
+ title.textContent="MISSION FAILED";subtitle.textContent=`Счёт: ${score} • Рекорд: ${best}`;
+ start.textContent="Повторить ✈️";
+ document.querySelectorAll(".tab-btn")[0].click();
+ overlay.classList.remove("hidden");
+}
+function begin(){reset();playing=true;overlay.classList.add("hidden");}
+
+start.onclick=begin;
+addEventListener("pointerdown",e=>{if(overlay.classList.contains("hidden"))flap()},{passive:true});
+addEventListener("keydown",e=>{
+ if(["Space","ArrowUp","KeyW"].includes(e.code)){e.preventDefault();playing?flap():begin();}
+});
+
+function background(dt){
+ const g=ctx.createLinearGradient(0,0,0,H);
+ g.addColorStop(0,"#020516");g.addColorStop(.55,"#07142d");g.addColorStop(1,"#02030a");
+ ctx.fillStyle=g;ctx.fillRect(0,0,W,H);
+ for(const s of stars){
+  s.x-=dt*.025*s.v;if(s.x<0)s.x=1;
+  ctx.globalAlpha=.3+.6*s.v;ctx.fillStyle="#c9fbff";
+  ctx.beginPath();ctx.arc(s.x*W,s.y*H,s.s*s.v,0,Math.PI*2);ctx.fill();
+ }
+ ctx.globalAlpha=1;
+ ctx.strokeStyle="#00eaff18";ctx.lineWidth=1;
+ for(let y=H*.72;y<H;y+=28){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke()}
+}
+
+function drawDrone(d){
+ const y=d.y+Math.sin(time*2+d.phase)*14;
+ ctx.save();ctx.translate(d.x,y);
+ const glow=d.type===0?"#ff3f91":d.type===1?"#8b7cff":"#00eaff";
+ ctx.shadowBlur=22;ctx.shadowColor=glow;
+ ctx.strokeStyle=glow;ctx.lineWidth=3;
+ for(const x of [-24,24]){
+  ctx.beginPath();ctx.moveTo(x,-5);ctx.lineTo(x,5);ctx.stroke();
+  ctx.beginPath();ctx.moveTo(x-10,0);ctx.lineTo(x+10,0);ctx.stroke();
+ }
+ ctx.fillStyle="#111a31";ctx.strokeStyle=glow;ctx.lineWidth=2;
+ ctx.beginPath();ctx.roundRect(-27,-12,54,24,7);ctx.fill();ctx.stroke();
+ ctx.fillStyle=glow;ctx.beginPath();ctx.arc(0,0,4.5,0,7);ctx.fill();
+ ctx.restore();
+}
+
+function drawBoostItem(b){
+ const pulse=1+Math.sin(time*4)*0.06;
+ const scale=b.spawnT*pulse;
+ ctx.save();
+ ctx.globalAlpha=b.spawnT;
+ ctx.translate(b.x,b.y);
+ ctx.scale(scale,scale);
+ ctx.globalAlpha=b.spawnT*0.35;
+ ctx.fillStyle="#4af0ff";ctx.shadowBlur=0;
+ ctx.beginPath();ctx.arc(0,0,b.r*1.55,0,Math.PI*2);ctx.fill();
+ ctx.globalAlpha=b.spawnT;
+ ctx.shadowBlur=28;ctx.shadowColor="#4af0ff";
+ const grad=ctx.createRadialGradient(-b.r*0.3,-b.r*0.35,b.r*0.1,0,0,b.r);
+ grad.addColorStop(0,"#eefeff");grad.addColorStop(.45,"#7ff2ff");grad.addColorStop(1,"#10c3e3");
+ ctx.fillStyle=grad;
+ ctx.beginPath();ctx.arc(0,0,b.r,0,Math.PI*2);ctx.fill();
+ ctx.restore();
+}
+
+function drawPlane(){
+ ctx.save();
+ ctx.translate(plane.x,plane.y);
+
+ const base=PLANE_COLORS[selectedPlaneColor]||PLANE_COLORS.white;
+ let scaleY=1;
+ let topColor=base.top;
+ let glowColor=base.glow;
+
+ if(barrelRoll.active){
+  const a=barrelRoll.rollAngle;
+  scaleY=Math.abs(Math.cos(a));
+  const upsideDown=Math.cos(a)<0;
+  if(scaleY<0.25){topColor="#ffffff";glowColor="#ffbc4a";}
+  else if(upsideDown){topColor="#ffbc4a";glowColor="#ff6a00";}
+  else{topColor=base.top;glowColor=base.glow;}
+ }
+
+ if(boostEffect.active&&!barrelRoll.active){glowColor="#7ff2ff";}
+
+ ctx.scale(1,scaleY);
+ ctx.rotate(plane.rot*(1-scaleY*0.6));
+ ctx.shadowBlur=25;ctx.shadowColor=glowColor;
+
+ const flame=ctx.createLinearGradient(-42,0,-5,0);
+ flame.addColorStop(0,"transparent");
+ flame.addColorStop(1,barrelRoll.active&&Math.cos(barrelRoll.rollAngle)<0?"#ffbc4a":glowColor);
+ ctx.fillStyle=flame;
+ ctx.beginPath();ctx.moveTo(-43,0);ctx.lineTo(-5,-5);ctx.lineTo(-5,5);ctx.closePath();ctx.fill();
+
+ ctx.fillStyle=topColor;
+ ctx.strokeStyle=glowColor;ctx.lineWidth=2;
+ ctx.beginPath();
+ ctx.moveTo(34,0);ctx.lineTo(-9,-9);ctx.lineTo(-24,-22);ctx.lineTo(-21,-5);
+ ctx.lineTo(-36,-1);ctx.lineTo(-21,4);ctx.lineTo(-24,22);ctx.lineTo(-9,9);ctx.closePath();
+ ctx.fill();ctx.stroke();
+
+ ctx.fillStyle="#8b7cff";
+ ctx.beginPath();ctx.ellipse(8,0,8,4,0,0,7);ctx.fill();
+
+ if(barrelRoll.active&&Math.cos(barrelRoll.rollAngle)<0&&scaleY>0.3){
+  ctx.fillStyle="#3a2a10";
+  ctx.beginPath();ctx.ellipse(2,0,14,2.2,0,0,7);ctx.fill();
+ }
+ ctx.restore();
+}
+
+function update(dt){
+ time+=dt;
+
+ if(barrelRoll.active){
+  barrelRoll.timer-=dt;
+  barrelRoll.rollAngle+=barrelRoll.rollSpeed*dt;
+  if(barrelRoll.timer<=0.4)barrelRoll.rollSpeed+=(0-barrelRoll.rollSpeed)*5*dt;
+  if(barrelRoll.timer<=0){
+   barrelRoll.active=false;barrelRoll.rollAngle=0;barrelRoll.rollSpeed=0;barrelRoll.clicks=0;
+   updateBarrelHUD();
+  }
+ }
+
+ if(boostEffect.active){
+  boostEffect.timer-=dt;
+  const elapsed=boostEffect.duration-boostEffect.timer;
+  const rampIn=Math.min(1,elapsed/0.4);
+  const rampOut=boostEffect.timer<0.6?Math.max(0,boostEffect.timer/0.6):1;
+  const ease=rampIn*rampOut;
+  boostEffect.mult=1+0.5*ease;
+  turboLvlEl.textContent=boostEffect.timer.toFixed(1)+"s";
+  if(Math.random()<0.9){
+   particles.push({x:plane.x-16,y:plane.y+(Math.random()-.5)*10,vx:-160-Math.random()*90,vy:(Math.random()-.5)*40,life:.4,max:.4,s:1.5+Math.random()*2.5,c:"#7ff2ff"});
+  }
+  if(boostEffect.timer<=0){
+   boostEffect.active=false;boostEffect.mult=1;turboLvlEl.textContent="—";
+  }
+ }
+
+ const worldSpeed=speedMultiplier*boostEffect.mult;
+
+ plane.vy+=1000*dt;plane.y+=plane.vy*dt;
+ plane.rot=Math.max(-.55,Math.min(.8,plane.vy/700));
+
+ spawn-=dt;
+ if(spawn<=0){addDrone();spawn=Math.max(.72,1.25-score*.006);}
+
+ for(const d of drones){
+  d.x-=(285+Math.min(score*2,130))*worldSpeed*dt;
+  if(!d.passed&&d.x<plane.x){
+   d.passed=true;score++;scoreEl.textContent=score;
+   updateSpeedMultiplier();
+   burst(plane.x,plane.y,"#8b7cff",7);
+  }
+  if(!barrelRoll.active&&hit(planeBox(),droneBox(d))){gameOver();return;}
+ }
+ drones=drones.filter(d=>d.x>-100);
+
+ /* буст-сфера */
+ if(boostItem){
+  boostItem.spawnT=Math.min(1,boostItem.spawnT+dt/0.4);
+  boostItem.x-=(285+Math.min(score*2,130))*worldSpeed*dt;
+  const dx=plane.x-boostItem.x,dy=plane.y-boostItem.y;
+  if(Math.sqrt(dx*dx+dy*dy)<34){collectBoost();}
+  else if(boostItem&&boostItem.x<-80){boostItem=null;}
+ }
+ if(!boostItem&&score>=nextBoostScore){
+  trySpawnBoostItem();
+  nextBoostScore+=30;
+ }
+
+ /* монетка: визуал без изменений, хитбокс увеличен в 1.5 раза */
+ if(coinItem){
+  coinItem.spawnT=Math.min(1,coinItem.spawnT+dt/0.35);
+  coinItem.rot+=dt*3.2;
+  coinItem.x-=(285+Math.min(score*2,130))*worldSpeed*dt;
+  const dx=plane.x-coinItem.x,dy=plane.y-coinItem.y;
+  if(Math.sqrt(dx*dx+dy*dy)<COIN_HITBOX_R){collectCoin();}
+  else if(coinItem&&coinItem.x<-60){coinItem=null;scheduleNextCoin();}
+ }
+ if(!coinItem&&score>=nextCoinScore){
+  trySpawnCoinItem();
+ }
+
+ if(!barrelRoll.active&&(plane.y<15||plane.y>H-15)){gameOver();return}
+
+ for(const p of particles){p.x+=p.vx*dt;p.y+=p.vy*dt;p.vy+=180*dt;p.life-=dt;}
+ particles=particles.filter(p=>p.life>0);
+}
+
+function draw(){
+ ctx.save();
+ if(shake>0){ctx.translate((Math.random()-.5)*shake,(Math.random()-.5)*shake);shake*=.86;if(shake<.1)shake=0;}
+ background(.016);
+
+ for(const d of drones)drawDrone(d);
+ if(boostItem)drawBoostItem(boostItem);
+ if(coinItem)drawCoinItem(coinItem);
+
+ for(const p of particles){
+  ctx.globalAlpha=Math.max(0,p.life/p.max);
+  ctx.fillStyle=p.c;ctx.shadowBlur=10;ctx.shadowColor=p.c;
+  ctx.beginPath();ctx.arc(p.x,p.y,p.s,0,7);ctx.fill();
+ }
+ ctx.globalAlpha=1;ctx.shadowBlur=0;
+
+ drawPlane();
+
+ if(barrelRoll.active){
+  const a=barrelRoll.rollAngle;
+  const intensity=Math.abs(Math.sin(a*2))*12;
+  for(let i=0;i<intensity;i++){
+   const ang=Math.random()*Math.PI*2;
+   const dist=20+Math.random()*25;
+   ctx.globalAlpha=.5+Math.random()*.5;
+   ctx.fillStyle="#ffbc4a";ctx.shadowBlur=8;ctx.shadowColor="#ffbc4a";
+   ctx.beginPath();ctx.arc(plane.x+Math.cos(ang)*dist,plane.y+Math.sin(ang)*dist,1+Math.random()*2,0,7);ctx.fill();
+  }
+  ctx.globalAlpha=1;ctx.shadowBlur=0;
+ }
+ ctx.restore();
+}
+
+function loop(t){
+ const dt=Math.min(.033,(t-last)/1000||0);last=t;
+ if(playing)update(dt);draw();requestAnimationFrame(loop);
+}
+requestAnimationFrame(loop);
+</script>
+</body>
+</html>
