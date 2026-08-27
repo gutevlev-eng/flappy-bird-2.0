@@ -49,7 +49,6 @@
 .colorCard.selected .check{opacity:1;transform:scale(1)}
 .colorCard .lockIcon{position:absolute;top:6px;right:9px;font-size:11px;opacity:.6}
 
-/* ── Фоны ── */
 .bgGrid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-top:4px}
 .bgCard{position:relative;padding:14px 8px 12px;border-radius:16px;border:1.5px solid #ffffff1a;background:#0b1830;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:8px;transition:transform .18s ease,box-shadow .25s ease,border-color .25s ease}
 .bgCard:hover{transform:translateY(-4px);border-color:#00eaff88}
@@ -66,7 +65,6 @@
 .bgCard.selected .check{opacity:1;transform:scale(1)}
 .bgCard .lockIcon{position:absolute;top:6px;right:9px;font-size:11px;opacity:.6}
 
-/* всплывающий текст награды за монету */
 .coinPopup{position:fixed;pointer-events:none;font-weight:800;font-size:20px;color:#ffd600;text-shadow:0 0 12px #ffd600,0 0 4px #fff;z-index:50;animation:coinPopUp .8s ease forwards}
 @keyframes coinPopUp{0%{opacity:0;transform:translate(-50%,0) scale(.7)}15%{opacity:1;transform:translate(-50%,-6px) scale(1.15)}100%{opacity:0;transform:translate(-50%,-46px) scale(1)}}
 </style>
@@ -325,4 +323,109 @@ let boostItem=null;
 let nextBoostScore=30;
 const boostEffect={active:false,timer:0,duration:3,mult:1};
 function resetBoostSystem(){
- boostItem
+ boostItem=null;nextBoostScore=30;
+ boostEffect.active=false;boostEffect.timer=0;boostEffect.mult=1;
+ turboLvlEl.textContent="—";
+}
+function trySpawnBoostItem(){
+ const margin=90;let bx,by,ok=false;
+ for(let attempt=0;attempt<20;attempt++){
+  bx=W+70+Math.random()*140;by=margin+Math.random()*(H-margin*2);ok=true;
+  for(const d of drones){
+   const dx=bx-d.x,dy=by-d.y;
+   if(Math.sqrt(dx*dx+dy*dy)<115){ok=false;break;}
+  }
+  if(coinItem){
+   const dx=bx-coinItem.x,dy=by-coinItem.y;
+   if(Math.sqrt(dx*dx+dy*dy)<90)ok=false;
+  }
+  if(ok)break;
+ }
+ boostItem={x:bx,y:by,r:24,spawnT:0};
+}
+function ringBurst(x,y,color){
+ const n=26;
+ for(let i=0;i<n;i++){
+  const ang=(i/n)*Math.PI*2;
+  particles.push({x,y,vx:Math.cos(ang)*230,vy:Math.sin(ang)*230,life:.5,max:.5,s:2.5,c:color});
+ }
+}
+function collectBoost(){
+ score+=10;scoreEl.textContent=score;
+ updateSpeedMultiplier();
+ burst(boostItem.x,boostItem.y,"#7ff2ff",30);
+ ringBurst(boostItem.x,boostItem.y,"#a8fbff");
+ boostItem=null;
+ boostEffect.active=true;boostEffect.timer=boostEffect.duration;
+}
+
+/* ══════════════ МОНЕТКИ на поле (коллектибл) ══════════════ */
+let coinItem=null;
+let nextCoinScore=0;
+const COIN_VISUAL_R=14;
+const COIN_HITBOX_R=28*1.5;
+
+function scheduleNextCoin(){
+ nextCoinScore=score+3+Math.floor(Math.random()*5);
+}
+
+function trySpawnCoinItem(){
+ const margin=90;let cx,cy,ok=false;
+ for(let attempt=0;attempt<20;attempt++){
+  cx=W+70+Math.random()*160;cy=margin+Math.random()*(H-margin*2);ok=true;
+  for(const d of drones){
+   const dx=cx-d.x,dy=cy-d.y;
+   if(Math.sqrt(dx*dx+dy*dy)<110){ok=false;break;}
+  }
+  if(boostItem){
+   const dx=cx-boostItem.x,dy=cy-boostItem.y;
+   if(Math.sqrt(dx*dx+dy*dy)<90)ok=false;
+  }
+  if(ok)break;
+ }
+ coinItem={x:cx,y:cy,r:COIN_VISUAL_R,spawnT:0,rot:0};
+}
+
+function collectCoin(){
+ const reward=1+Math.floor(Math.random()*3);
+ addCoins(reward);
+ const rect=canvas.getBoundingClientRect();
+ showCoinPopup(rect.left+coinItem.x,rect.top+coinItem.y,reward);
+ burst(coinItem.x,coinItem.y,"#ffd600",22);
+ coinItem=null;
+ scheduleNextCoin();
+}
+
+function drawCoinItem(cn){
+ const pulse=1+Math.sin(time*5)*0.08;
+ const scale=cn.spawnT*pulse;
+ ctx.save();
+ ctx.globalAlpha=cn.spawnT;
+ ctx.translate(cn.x,cn.y);
+ ctx.rotate(cn.rot);
+ ctx.scale(scale*Math.max(0.15,Math.abs(Math.cos(cn.rot*1.6))),scale);
+
+ ctx.globalAlpha=cn.spawnT*0.4;
+ ctx.fillStyle="#ffd600";ctx.shadowBlur=0;
+ ctx.beginPath();ctx.arc(0,0,cn.r*1.7,0,Math.PI*2);ctx.fill();
+
+ ctx.globalAlpha=cn.spawnT;
+ ctx.shadowBlur=22;ctx.shadowColor="#ffd600";
+ const grad=ctx.createRadialGradient(-cn.r*0.3,-cn.r*0.3,cn.r*0.1,0,0,cn.r);
+ grad.addColorStop(0,"#fff6c8");grad.addColorStop(.5,"#ffd600");grad.addColorStop(1,"#b98700");
+ ctx.fillStyle=grad;
+ ctx.beginPath();ctx.arc(0,0,cn.r,0,Math.PI*2);ctx.fill();
+
+ ctx.globalAlpha=cn.spawnT*0.9;
+ ctx.fillStyle="#7a5900";
+ ctx.font="bold "+(cn.r*1.1)+"px Arial";
+ ctx.textAlign="center";ctx.textBaseline="middle";
+ ctx.fillText("$",0,1);
+ ctx.restore();
+}
+
+/* ══════════════ Состояние динамических фонов ══════════════ */
+let bg={neonStars:[],synth:{gridOffset:0},matrixCols:[],bubbles:[],galaxyStars:[]};
+
+function initBackgroundState(){
+ bg.neonStars=
