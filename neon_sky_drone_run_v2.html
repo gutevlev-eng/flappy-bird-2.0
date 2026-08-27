@@ -48,6 +48,10 @@
 .colorCard .check{position:absolute;top:6px;right:9px;font-size:13px;color:#7effa0;opacity:0;transform:scale(.5);transition:all .2s ease;text-shadow:0 0 8px #7effa0}
 .colorCard.selected .check{opacity:1;transform:scale(1)}
 .colorCard .lockIcon{position:absolute;top:6px;right:9px;font-size:11px;opacity:.6}
+
+/* всплывающий текст награды за монету */
+.coinPopup{position:fixed;pointer-events:none;font-weight:800;font-size:20px;color:#ffd600;text-shadow:0 0 12px #ffd600,0 0 4px #fff;z-index:50;animation:coinPopUp .8s ease forwards}
+@keyframes coinPopUp{0%{opacity:0;transform:translate(-50%,0) scale(.7)}15%{opacity:1;transform:translate(-50%,-6px) scale(1.15)}100%{opacity:0;transform:translate(-50%,-46px) scale(1)}}
 </style>
 </head>
 <body>
@@ -72,7 +76,7 @@
    <h1 id="title">NEON SKY</h1><p id="subtitle">DRONE RUN</p>
    <div class="coinBalance"><div class="coinIcon"></div><span id="coinsMenu">0</span> Coins</div>
    <button id="start">Взлететь ✈️</button>
-   <div class="hint">Тап / клик / Space — вверх<br>10 кликов = бочка (неуязвимость 3с)<br>Каждые 10 очков = +10% скорости дронов<br>Каждые 30 очков = буст-сфера (+10 очков, ускорение 3с)<br>Собирай 🪙 монеты, появляющиеся раз в 3–7 очков</div>
+   <div class="hint">Тап / клик / Space — вверх<br>10 кликов = бочка (неуязвимость 3с)<br>Каждые 10 очков = +10% скорости дронов<br>Каждые 30 очков = буст-сфера (+10 очков, ускорение 3с)<br>Собирай 🪙 монеты (+1..3 Coins), появляются раз в 3–7 очков</div>
   </div>
 
   <div class="panel hidden" id="panel-shop">
@@ -110,6 +114,16 @@ function addCoins(n){
  updateCoinsUI();
 }
 updateCoinsUI();
+
+function showCoinPopup(x,y,amount){
+ const el=document.createElement("div");
+ el.className="coinPopup";
+ el.textContent="+"+amount+" 🪙";
+ el.style.left=x+"px";
+ el.style.top=y+"px";
+ document.body.appendChild(el);
+ setTimeout(()=>el.remove(),800);
+}
 
 /* ══════════════ МАГАЗИН: цвета самолёта ══════════════ */
 const PLANE_COLORS={
@@ -259,9 +273,11 @@ function collectBoost(){
 /* ══════════════ МОНЕТКИ на поле (коллектибл) ══════════════ */
 let coinItem=null;
 let nextCoinScore=0;
+const COIN_VISUAL_R=14;          // визуальный размер — НЕ меняем
+const COIN_HITBOX_R=28*1.5;      // хитбокс увеличен в 1.5 раза (было 28)
 
 function scheduleNextCoin(){
- nextCoinScore=score+3+Math.floor(Math.random()*5); // 3..7
+ nextCoinScore=score+3+Math.floor(Math.random()*5); // 3..7, не меняем
 }
 
 function trySpawnCoinItem(){
@@ -278,11 +294,18 @@ function trySpawnCoinItem(){
   }
   if(ok)break;
  }
- coinItem={x:cx,y:cy,r:14,spawnT:0,rot:0};
+ coinItem={x:cx,y:cy,r:COIN_VISUAL_R,spawnT:0,rot:0};
 }
 
+/* награда теперь случайная: от 1 до 3 Coins включительно */
 function collectCoin(){
- addCoins(1);
+ const reward=1+Math.floor(Math.random()*3); // 1,2 или 3
+ addCoins(reward);
+
+ /* всплывающая подсказка с точной наградой, экранные координаты */
+ const rect=canvas.getBoundingClientRect();
+ showCoinPopup(rect.left+coinItem.x,rect.top+coinItem.y,reward);
+
  burst(coinItem.x,coinItem.y,"#ffd600",22);
  coinItem=null;
  scheduleNextCoin();
@@ -536,13 +559,13 @@ function update(dt){
   nextBoostScore+=30;
  }
 
- /* монетка */
+ /* монетка: визуал без изменений, хитбокс увеличен в 1.5 раза */
  if(coinItem){
   coinItem.spawnT=Math.min(1,coinItem.spawnT+dt/0.35);
   coinItem.rot+=dt*3.2;
   coinItem.x-=(285+Math.min(score*2,130))*worldSpeed*dt;
   const dx=plane.x-coinItem.x,dy=plane.y-coinItem.y;
-  if(Math.sqrt(dx*dx+dy*dy)<28){collectCoin();}
+  if(Math.sqrt(dx*dx+dy*dy)<COIN_HITBOX_R){collectCoin();}
   else if(coinItem&&coinItem.x<-60){coinItem=null;scheduleNextCoin();}
  }
  if(!coinItem&&score>=nextCoinScore){
