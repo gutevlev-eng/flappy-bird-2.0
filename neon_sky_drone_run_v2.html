@@ -10,10 +10,10 @@
 .box{padding:8px 13px;border:1px solid #00eaff55;border-radius:13px;background:#030a18cc}.small{font-size:10px;letter-spacing:2px;color:#73eaff}.num{font-size:24px;font-weight:800;color:white}
 #coin-indicator{border-color:#ffd60055}#coin-indicator .num{color:#ffd600;text-shadow:0 0 10px #ffd60088}
 #overlay{position:fixed;inset:0;display:grid;place-items:center;background:#0009;backdrop-filter:blur(2px)}
-.card{width:min(440px,calc(100% - 30px));max-height:92vh;overflow-y:auto;padding:26px 22px;text-align:center;border-radius:24px;background:#050b1de8;border:1px solid #00eaff66;box-shadow:0 0 60px #00eaff22}
+.card{width:min(460px,calc(100% - 30px));max-height:92vh;overflow-y:auto;padding:26px 22px;text-align:center;border-radius:24px;background:#050b1de8;border:1px solid #00eaff66;box-shadow:0 0 60px #00eaff22}
 .card::-webkit-scrollbar{width:6px}.card::-webkit-scrollbar-thumb{background:#00eaff55;border-radius:6px}
 .card h1{margin:0 0 4px;font-size:44px;letter-spacing:4px;text-shadow:0 0 20px #00eaff}
-.card h2.shopTitle{margin:4px 0 6px;font-size:20px;letter-spacing:3px;color:#8fe9ff;text-shadow:0 0 14px #00eaff88}
+.card h2.shopTitle{margin:4px 0 6px;font-size:19px;letter-spacing:2.5px;color:#8fe9ff;text-shadow:0 0 14px #00eaff88}
 .card p{color:#a8bad0;margin:0 0 20px}
 .card button#start{border:0;border-radius:14px;padding:14px 24px;font-size:17px;font-weight:800;background:linear-gradient(90deg,#00eaff,#8b7cff);color:#02101a;width:100%;cursor:pointer;transition:transform .15s,box-shadow .25s;box-shadow:0 0 22px #00eaff44}
 .card button#start:hover{transform:translateY(-2px);box-shadow:0 0 32px #00eaff88}
@@ -21,8 +21,8 @@
 .hint{margin-top:15px;color:#7188a4;font-size:12px;line-height:1.6}
 .hidden{display:none!important}
 
-.tabs{display:flex;gap:8px;margin-bottom:20px}
-.tab-btn{flex:1;padding:11px 6px;border-radius:12px;border:1px solid #00eaff33;background:#0a1526;color:#8fe9ff;font-weight:800;letter-spacing:1.5px;font-size:12.5px;cursor:pointer;transition:all .25s ease}
+.tabs{display:flex;gap:6px;margin-bottom:20px}
+.tab-btn{flex:1;padding:10px 4px;border-radius:12px;border:1px solid #00eaff33;background:#0a1526;color:#8fe9ff;font-weight:800;letter-spacing:1px;font-size:11px;cursor:pointer;transition:all .25s ease}
 .tab-btn:hover{border-color:#00eaff88;color:#c9f8ff}
 .tab-btn.active{background:linear-gradient(90deg,#00eaff,#8b7cff);color:#02101a;box-shadow:0 0 18px #00eaff77;border-color:transparent}
 .panel{animation:fadeIn .3s ease}
@@ -49,6 +49,12 @@
 .colorCard.selected .check{opacity:1;transform:scale(1)}
 .colorCard .lockIcon{position:absolute;top:6px;right:9px;font-size:11px;opacity:.6}
 
+/* хвосты — карточки такого же стиля */
+.tailIcon{width:46px;height:10px;border-radius:6px;background:linear-gradient(90deg,var(--glow,#00eaff),transparent);box-shadow:0 0 16px var(--glow,#00eaff);transition:box-shadow .25s}
+.tailIcon.none{background:repeating-linear-gradient(90deg,#4a5a72 0 6px,transparent 6px 12px);box-shadow:none;opacity:.6}
+.colorCard.selected .tailIcon{box-shadow:0 0 26px var(--glow,#00eaff),0 0 6px #fff}
+.colorCard.locked .tailIcon{filter:grayscale(.35) brightness(.75)}
+
 /* всплывающий текст награды за монету */
 .coinPopup{position:fixed;pointer-events:none;font-weight:800;font-size:20px;color:#ffd600;text-shadow:0 0 12px #ffd600,0 0 4px #fff;z-index:50;animation:coinPopUp .8s ease forwards}
 @keyframes coinPopUp{0%{opacity:0;transform:translate(-50%,0) scale(.7)}15%{opacity:1;transform:translate(-50%,-6px) scale(1.15)}100%{opacity:0;transform:translate(-50%,-46px) scale(1)}}
@@ -68,15 +74,16 @@
 <div id="overlay">
  <div class="card">
   <div class="tabs">
-   <button class="tab-btn active" data-tab="main">ГЛАВНОЕ МЕНЮ</button>
-   <button class="tab-btn" data-tab="shop">МАГАЗИН</button>
+   <button class="tab-btn active" data-tab="main">МЕНЮ</button>
+   <button class="tab-btn" data-tab="shop">🎨 ЦВЕТА</button>
+   <button class="tab-btn" data-tab="tails">✈️ ХВОСТЫ</button>
   </div>
 
   <div class="panel" id="panel-main">
    <h1 id="title">NEON SKY</h1><p id="subtitle">DRONE RUN</p>
    <div class="coinBalance"><div class="coinIcon"></div><span id="coinsMenu">0</span> Coins</div>
    <button id="start">Взлететь ✈️</button>
-   <div class="hint">Тап / клик / Space — вверх<br>10 кликов = бочка (неуязвимость 3с)<br>Каждые 10 очков = +10% скорости дронов<br>Каждые 30 очков = буст-сфера (+10 очков, ускорение 3с)<br>Собирай 🪙 монеты (+1..3 Coins), появляются раз в 3–7 очков</div>
+   <div class="hint">Тап / клик / Space — вверх<br>10 кликов = бочка (неуязвимость 3с)<br>Каждые 10 очков = +10% скорости дронов<br>Каждые 30 очков = буст-сфера (+10 очков, ускорение 3с)<br>Собирай 🪙 монеты (+1..3 Coins), появляются раз в 3–7 очков<br>Выбери цвет и хвост в магазине</div>
   </div>
 
   <div class="panel hidden" id="panel-shop">
@@ -84,6 +91,13 @@
    <div class="coinBalance"><div class="coinIcon"></div><span id="coinsShop">0</span> Coins</div>
    <div class="colorGrid" id="colorGrid"></div>
    <div class="hint">Белый цвет доступен бесплатно.<br>Остальные цвета — 15 Coins, покупаются навсегда.</div>
+  </div>
+
+  <div class="panel hidden" id="panel-tails">
+   <h2 class="shopTitle">НЕОНОВЫЕ ХВОСТЫ</h2>
+   <div class="coinBalance"><div class="coinIcon"></div><span id="coinsTails">0</span> Coins</div>
+   <div class="colorGrid" id="tailGrid"></div>
+   <div class="hint">«Без хвоста» доступен бесплатно.<br>Остальные стили — 10 Coins, покупаются навсегда.<br>Активен только один хвост одновременно.</div>
   </div>
  </div>
 </div>
@@ -96,7 +110,7 @@ const title=document.getElementById("title"),subtitle=document.getElementById("s
 const barrelCountEl=document.getElementById("barrelCount");
 const speedLvlEl=document.getElementById("speedLvl");
 const turboLvlEl=document.getElementById("turboLvl");
-const coinsHUD=document.getElementById("coinsHUD"),coinsMenu=document.getElementById("coinsMenu"),coinsShop=document.getElementById("coinsShop");
+const coinsHUD=document.getElementById("coinsHUD"),coinsMenu=document.getElementById("coinsMenu"),coinsShop=document.getElementById("coinsShop"),coinsTails=document.getElementById("coinsTails");
 
 let W,H,DPR=1,last=0,time=0,playing=false,score=0,best=+localStorage.neonSkyBest||0,spawn=0,shake=0;
 bestEl.textContent=best;
@@ -107,6 +121,7 @@ function updateCoinsUI(){
  coinsHUD.textContent=coins;
  coinsMenu.textContent=coins;
  coinsShop.textContent=coins;
+ coinsTails.textContent=coins;
 }
 function addCoins(n){
  coins+=n;
@@ -166,7 +181,7 @@ function buildColorGrid(){
    if(isOwned){
     selectedPlaneColor=key;
     saveSelected();
-    document.querySelectorAll(".colorCard").forEach(el=>el.classList.remove("selected"));
+    document.querySelectorAll("#colorGrid .colorCard").forEach(el=>el.classList.remove("selected"));
     card.classList.add("selected");
    }else{
     if(coins>=c.price){
@@ -190,6 +205,74 @@ function buildColorGrid(){
 }
 buildColorGrid();
 
+/* ══════════════ МАГАЗИН: хвосты ══════════════ */
+const TAIL_STYLES={
+ none:{name:"Без хвоста",emoji:"➖",glow:"#4a5a72",price:0},
+ cyan:{name:"Циан",emoji:"🔵",glow:"#00eaff",price:10},
+ pink:{name:"Розовый",emoji:"🌸",glow:"#ff3fa0",price:10},
+ lime:{name:"Лайм",emoji:"🟩",glow:"#9dff3f",price:10},
+ purple:{name:"Фиолетовый",emoji:"🟣",glow:"#a06bff",price:10},
+ gold:{name:"Золото",emoji:"🟡",glow:"#ffd600",price:10}
+};
+let ownedTails=JSON.parse(localStorage.neonSkyOwnedTails||'["none"]');
+if(!ownedTails.includes("none"))ownedTails.push("none");
+let selectedTail=localStorage.neonSkyTail||"none";
+if(!ownedTails.includes(selectedTail))selectedTail="none";
+
+function saveOwnedTails(){localStorage.neonSkyOwnedTails=JSON.stringify(ownedTails);}
+function saveSelectedTail(){localStorage.neonSkyTail=selectedTail;}
+
+function buildTailGrid(){
+ const grid=document.getElementById("tailGrid");
+ grid.innerHTML="";
+ for(const key in TAIL_STYLES){
+  const c=TAIL_STYLES[key];
+  const owned=ownedTails.includes(key);
+  const card=document.createElement("div");
+  card.className="colorCard"+(key===selectedTail?" selected":"")+(!owned?" locked":"");
+  card.style.setProperty("--glow",c.glow);
+
+  let bottomHtml="";
+  if(owned){
+   bottomHtml=`<div class="name">${c.emoji} ${c.name}</div>`;
+  }else{
+   bottomHtml=`<div class="name">${c.emoji} ${c.name}</div><div class="price"><div class="coinIcon"></div>${c.price}</div>`;
+  }
+
+  const iconClass=key==="none"?"tailIcon none":"tailIcon";
+  card.innerHTML=`<div class="check">✓</div>${!owned?'<div class="lockIcon">🔒</div>':""}<div class="${iconClass}"></div>${bottomHtml}`;
+
+  card.onclick=()=>{
+   const isOwned=ownedTails.includes(key);
+   if(isOwned){
+    selectedTail=key;
+    saveSelectedTail();
+    document.querySelectorAll("#tailGrid .colorCard").forEach(el=>el.classList.remove("selected"));
+    card.classList.add("selected");
+    trailPoints=[];
+   }else{
+    if(coins>=c.price){
+     coins-=c.price;
+     localStorage.neonSkyCoins=coins;
+     updateCoinsUI();
+     ownedTails.push(key);
+     saveOwnedTails();
+     selectedTail=key;
+     saveSelectedTail();
+     trailPoints=[];
+     buildTailGrid();
+    }else{
+     card.classList.remove("shakeErr");
+     void card.offsetWidth;
+     card.classList.add("shakeErr");
+    }
+   }
+  };
+  grid.appendChild(card);
+ }
+}
+buildTailGrid();
+
 /* ══════════════ Вкладки меню ══════════════ */
 document.querySelectorAll(".tab-btn").forEach(btn=>{
  btn.onclick=()=>{
@@ -198,6 +281,7 @@ document.querySelectorAll(".tab-btn").forEach(btn=>{
   const tab=btn.dataset.tab;
   document.getElementById("panel-main").classList.toggle("hidden",tab!=="main");
   document.getElementById("panel-shop").classList.toggle("hidden",tab!=="shop");
+  document.getElementById("panel-tails").classList.toggle("hidden",tab!=="tails");
  };
 });
 
@@ -273,11 +357,11 @@ function collectBoost(){
 /* ══════════════ МОНЕТКИ на поле (коллектибл) ══════════════ */
 let coinItem=null;
 let nextCoinScore=0;
-const COIN_VISUAL_R=14;          // визуальный размер — НЕ меняем
-const COIN_HITBOX_R=28*1.5;      // хитбокс увеличен в 1.5 раза (было 28)
+const COIN_VISUAL_R=28;   // визуальный размер (увеличен в 2 раза от исходных 14)
+const COIN_HITBOX_R=42;   // хитбокс сбора (28*1.5), не меняется
 
 function scheduleNextCoin(){
- nextCoinScore=score+3+Math.floor(Math.random()*5); // 3..7, не меняем
+ nextCoinScore=score+3+Math.floor(Math.random()*5); // 3..7
 }
 
 function trySpawnCoinItem(){
@@ -297,15 +381,11 @@ function trySpawnCoinItem(){
  coinItem={x:cx,y:cy,r:COIN_VISUAL_R,spawnT:0,rot:0};
 }
 
-/* награда теперь случайная: от 1 до 3 Coins включительно */
 function collectCoin(){
  const reward=1+Math.floor(Math.random()*3); // 1,2 или 3
  addCoins(reward);
-
- /* всплывающая подсказка с точной наградой, экранные координаты */
  const rect=canvas.getBoundingClientRect();
  showCoinPopup(rect.left+coinItem.x,rect.top+coinItem.y,reward);
-
  burst(coinItem.x,coinItem.y,"#ffd600",22);
  coinItem=null;
  scheduleNextCoin();
@@ -339,6 +419,42 @@ function drawCoinItem(cn){
  ctx.restore();
 }
 
+/* ══════════════ ХВОСТ (неоновый след за самолётом) ══════════════ */
+let trailPoints=[];
+const TAIL_LIFETIME=1.0; // секунда
+
+function pushTrailPoint(){
+ if(selectedTail==="none")return;
+ trailPoints.push({x:plane.x-18,y:plane.y,t:time});
+ while(trailPoints.length&&time-trailPoints[0].t>TAIL_LIFETIME)trailPoints.shift();
+}
+
+function drawTrail(){
+ if(selectedTail==="none"||trailPoints.length<2)return;
+ const style=TAIL_STYLES[selectedTail];
+ ctx.save();
+ ctx.lineCap="round";
+ for(let i=1;i<trailPoints.length;i++){
+  const p0=trailPoints[i-1],p1=trailPoints[i];
+  const age=time-p1.t;
+  if(age>TAIL_LIFETIME)continue;
+  const t=Math.min(1,Math.max(0,age/TAIL_LIFETIME));
+  const alpha=Math.pow(1-t,1.5);
+  const width=7*(1-t)+0.6;
+  ctx.globalAlpha=alpha*0.9;
+  ctx.strokeStyle=style.glow;
+  ctx.lineWidth=width;
+  ctx.shadowBlur=18*(1-t)+2;
+  ctx.shadowColor=style.glow;
+  ctx.beginPath();
+  ctx.moveTo(p0.x,p0.y);
+  ctx.lineTo(p1.x,p1.y);
+  ctx.stroke();
+ }
+ ctx.globalAlpha=1;ctx.shadowBlur=0;
+ ctx.restore();
+}
+
 /* ── ресайз ── */
 function resize(){
  DPR=Math.min(devicePixelRatio||1,2);W=innerWidth;H=innerHeight;
@@ -358,6 +474,7 @@ function reset(){
  speedMultiplier=1.0;lastSpeedTier=0;speedLvlEl.textContent="×1.00";
  resetBarrel();resetBoostSystem();
  coinItem=null;scheduleNextCoin();
+ trailPoints=[];
 }
 
 function flap(){
@@ -453,169 +570,4 @@ function drawBoostItem(b){
 
 function drawPlane(){
  ctx.save();
- ctx.translate(plane.x,plane.y);
-
- const base=PLANE_COLORS[selectedPlaneColor]||PLANE_COLORS.white;
- let scaleY=1;
- let topColor=base.top;
- let glowColor=base.glow;
-
- if(barrelRoll.active){
-  const a=barrelRoll.rollAngle;
-  scaleY=Math.abs(Math.cos(a));
-  const upsideDown=Math.cos(a)<0;
-  if(scaleY<0.25){topColor="#ffffff";glowColor="#ffbc4a";}
-  else if(upsideDown){topColor="#ffbc4a";glowColor="#ff6a00";}
-  else{topColor=base.top;glowColor=base.glow;}
- }
-
- if(boostEffect.active&&!barrelRoll.active){glowColor="#7ff2ff";}
-
- ctx.scale(1,scaleY);
- ctx.rotate(plane.rot*(1-scaleY*0.6));
- ctx.shadowBlur=25;ctx.shadowColor=glowColor;
-
- const flame=ctx.createLinearGradient(-42,0,-5,0);
- flame.addColorStop(0,"transparent");
- flame.addColorStop(1,barrelRoll.active&&Math.cos(barrelRoll.rollAngle)<0?"#ffbc4a":glowColor);
- ctx.fillStyle=flame;
- ctx.beginPath();ctx.moveTo(-43,0);ctx.lineTo(-5,-5);ctx.lineTo(-5,5);ctx.closePath();ctx.fill();
-
- ctx.fillStyle=topColor;
- ctx.strokeStyle=glowColor;ctx.lineWidth=2;
- ctx.beginPath();
- ctx.moveTo(34,0);ctx.lineTo(-9,-9);ctx.lineTo(-24,-22);ctx.lineTo(-21,-5);
- ctx.lineTo(-36,-1);ctx.lineTo(-21,4);ctx.lineTo(-24,22);ctx.lineTo(-9,9);ctx.closePath();
- ctx.fill();ctx.stroke();
-
- ctx.fillStyle="#8b7cff";
- ctx.beginPath();ctx.ellipse(8,0,8,4,0,0,7);ctx.fill();
-
- if(barrelRoll.active&&Math.cos(barrelRoll.rollAngle)<0&&scaleY>0.3){
-  ctx.fillStyle="#3a2a10";
-  ctx.beginPath();ctx.ellipse(2,0,14,2.2,0,0,7);ctx.fill();
- }
- ctx.restore();
-}
-
-function update(dt){
- time+=dt;
-
- if(barrelRoll.active){
-  barrelRoll.timer-=dt;
-  barrelRoll.rollAngle+=barrelRoll.rollSpeed*dt;
-  if(barrelRoll.timer<=0.4)barrelRoll.rollSpeed+=(0-barrelRoll.rollSpeed)*5*dt;
-  if(barrelRoll.timer<=0){
-   barrelRoll.active=false;barrelRoll.rollAngle=0;barrelRoll.rollSpeed=0;barrelRoll.clicks=0;
-   updateBarrelHUD();
-  }
- }
-
- if(boostEffect.active){
-  boostEffect.timer-=dt;
-  const elapsed=boostEffect.duration-boostEffect.timer;
-  const rampIn=Math.min(1,elapsed/0.4);
-  const rampOut=boostEffect.timer<0.6?Math.max(0,boostEffect.timer/0.6):1;
-  const ease=rampIn*rampOut;
-  boostEffect.mult=1+0.5*ease;
-  turboLvlEl.textContent=boostEffect.timer.toFixed(1)+"s";
-  if(Math.random()<0.9){
-   particles.push({x:plane.x-16,y:plane.y+(Math.random()-.5)*10,vx:-160-Math.random()*90,vy:(Math.random()-.5)*40,life:.4,max:.4,s:1.5+Math.random()*2.5,c:"#7ff2ff"});
-  }
-  if(boostEffect.timer<=0){
-   boostEffect.active=false;boostEffect.mult=1;turboLvlEl.textContent="—";
-  }
- }
-
- const worldSpeed=speedMultiplier*boostEffect.mult;
-
- plane.vy+=1000*dt;plane.y+=plane.vy*dt;
- plane.rot=Math.max(-.55,Math.min(.8,plane.vy/700));
-
- spawn-=dt;
- if(spawn<=0){addDrone();spawn=Math.max(.72,1.25-score*.006);}
-
- for(const d of drones){
-  d.x-=(285+Math.min(score*2,130))*worldSpeed*dt;
-  if(!d.passed&&d.x<plane.x){
-   d.passed=true;score++;scoreEl.textContent=score;
-   updateSpeedMultiplier();
-   burst(plane.x,plane.y,"#8b7cff",7);
-  }
-  if(!barrelRoll.active&&hit(planeBox(),droneBox(d))){gameOver();return;}
- }
- drones=drones.filter(d=>d.x>-100);
-
- /* буст-сфера */
- if(boostItem){
-  boostItem.spawnT=Math.min(1,boostItem.spawnT+dt/0.4);
-  boostItem.x-=(285+Math.min(score*2,130))*worldSpeed*dt;
-  const dx=plane.x-boostItem.x,dy=plane.y-boostItem.y;
-  if(Math.sqrt(dx*dx+dy*dy)<34){collectBoost();}
-  else if(boostItem&&boostItem.x<-80){boostItem=null;}
- }
- if(!boostItem&&score>=nextBoostScore){
-  trySpawnBoostItem();
-  nextBoostScore+=30;
- }
-
- /* монетка: визуал без изменений, хитбокс увеличен в 1.5 раза */
- if(coinItem){
-  coinItem.spawnT=Math.min(1,coinItem.spawnT+dt/0.35);
-  coinItem.rot+=dt*3.2;
-  coinItem.x-=(285+Math.min(score*2,130))*worldSpeed*dt;
-  const dx=plane.x-coinItem.x,dy=plane.y-coinItem.y;
-  if(Math.sqrt(dx*dx+dy*dy)<COIN_HITBOX_R){collectCoin();}
-  else if(coinItem&&coinItem.x<-60){coinItem=null;scheduleNextCoin();}
- }
- if(!coinItem&&score>=nextCoinScore){
-  trySpawnCoinItem();
- }
-
- if(!barrelRoll.active&&(plane.y<15||plane.y>H-15)){gameOver();return}
-
- for(const p of particles){p.x+=p.vx*dt;p.y+=p.vy*dt;p.vy+=180*dt;p.life-=dt;}
- particles=particles.filter(p=>p.life>0);
-}
-
-function draw(){
- ctx.save();
- if(shake>0){ctx.translate((Math.random()-.5)*shake,(Math.random()-.5)*shake);shake*=.86;if(shake<.1)shake=0;}
- background(.016);
-
- for(const d of drones)drawDrone(d);
- if(boostItem)drawBoostItem(boostItem);
- if(coinItem)drawCoinItem(coinItem);
-
- for(const p of particles){
-  ctx.globalAlpha=Math.max(0,p.life/p.max);
-  ctx.fillStyle=p.c;ctx.shadowBlur=10;ctx.shadowColor=p.c;
-  ctx.beginPath();ctx.arc(p.x,p.y,p.s,0,7);ctx.fill();
- }
- ctx.globalAlpha=1;ctx.shadowBlur=0;
-
- drawPlane();
-
- if(barrelRoll.active){
-  const a=barrelRoll.rollAngle;
-  const intensity=Math.abs(Math.sin(a*2))*12;
-  for(let i=0;i<intensity;i++){
-   const ang=Math.random()*Math.PI*2;
-   const dist=20+Math.random()*25;
-   ctx.globalAlpha=.5+Math.random()*.5;
-   ctx.fillStyle="#ffbc4a";ctx.shadowBlur=8;ctx.shadowColor="#ffbc4a";
-   ctx.beginPath();ctx.arc(plane.x+Math.cos(ang)*dist,plane.y+Math.sin(ang)*dist,1+Math.random()*2,0,7);ctx.fill();
-  }
-  ctx.globalAlpha=1;ctx.shadowBlur=0;
- }
- ctx.restore();
-}
-
-function loop(t){
- const dt=Math.min(.033,(t-last)/1000||0);last=t;
- if(playing)update(dt);draw();requestAnimationFrame(loop);
-}
-requestAnimationFrame(loop);
-</script>
-</body>
-</html>
+ ctx.translate(plane.x,plane
