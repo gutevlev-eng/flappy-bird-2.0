@@ -1,4 +1,4 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="ru">
 <head>
 <meta charset="UTF-8">
@@ -6,7 +6,9 @@
 <title>NEON SKY</title>
 
 <style>
-*{box-sizing:border-box}
+*{
+ box-sizing:border-box;
+}
 
 html,body{
  margin:0;
@@ -14,87 +16,100 @@ html,body{
  height:100%;
  overflow:hidden;
  background:#02040c;
- color:white;
  font-family:Arial,sans-serif;
 }
 
-body{touch-action:none}
-canvas{display:block;width:100%;height:100%}
+body{
+ touch-action:none;
+}
+
+canvas{
+ display:block;
+ width:100%;
+ height:100%;
+}
+
+.hidden{
+ display:none!important;
+}
+
+/* ───────────────── HUD ───────────────── */
 
 #hud{
  position:fixed;
+ top:12px;
+ left:12px;
+ right:12px;
  z-index:5;
- top:14px;
- left:14px;
- right:14px;
  display:flex;
- justify-content:space-between;
- gap:8px;
  flex-wrap:wrap;
+ justify-content:space-between;
+ gap:7px;
  pointer-events:none;
 }
 
 .box{
- padding:7px 12px;
+ min-width:76px;
+ padding:7px 11px;
  border:1px solid #00eaff55;
  border-radius:12px;
  background:#030a18cc;
+ box-shadow:0 0 14px #00eaff12;
 }
 
 .small{
  color:#73eaff;
- font-size:10px;
- letter-spacing:1.5px;
+ font-size:9px;
+ letter-spacing:1.7px;
 }
 
 .num{
- color:white;
- font-size:22px;
- font-weight:bold;
+ color:#fff;
+ font-size:21px;
+ font-weight:800;
 }
 
-#coin-indicator{border-color:#ffd60066}
+#coin-indicator{
+ border-color:#ffd60066;
+}
+
 #coin-indicator .num{
  color:#ffd600;
- text-shadow:0 0 10px #ffd600;
+ text-shadow:0 0 10px #ffd60088;
 }
+
+/* ───────────────── Меню ───────────────── */
 
 #overlay{
  position:fixed;
- z-index:10;
  inset:0;
+ z-index:10;
  display:grid;
  place-items:center;
- background:#0009;
+ background:#000a;
  backdrop-filter:blur(3px);
 }
 
 .card{
- width:min(540px,calc(100% - 24px));
- max-height:94vh;
- overflow:auto;
- padding:22px 18px;
- text-align:center;
+ width:min(510px,calc(100% - 24px));
+ max-height:93vh;
+ overflow-y:auto;
+ padding:22px;
  border:1px solid #00eaff66;
  border-radius:24px;
- background:#050b1dec;
+ background:#050b1dee;
  box-shadow:0 0 60px #00eaff22;
+ text-align:center;
 }
 
-.card h1{
- margin:4px 0 0;
- color:#fff;
- font-size:42px;
- letter-spacing:4px;
- text-shadow:0 0 20px #00eaff;
+.card::-webkit-scrollbar{
+ width:6px;
 }
 
-.card p{
- margin:4px 0 17px;
- color:#9bb2ca;
+.card::-webkit-scrollbar-thumb{
+ border-radius:8px;
+ background:#00eaff77;
 }
-
-.hidden{display:none!important}
 
 .tabs{
  display:flex;
@@ -104,251 +119,366 @@ canvas{display:block;width:100%;height:100%}
 
 .tab-btn{
  flex:1;
- min-height:40px;
- padding:8px 4px;
- border:1px solid #00eaff44;
- border-radius:10px;
- background:#09182c;
- color:#91edff;
+ min-height:42px;
+ padding:8px 3px;
+ border:1px solid #00eaff33;
+ border-radius:11px;
+ background:#0a1526;
+ color:#9aeaff;
  font-size:10px;
- font-weight:bold;
- letter-spacing:.7px;
+ font-weight:800;
+ letter-spacing:.5px;
  cursor:pointer;
+ transition:.2s;
+}
+
+.tab-btn:hover{
+ border-color:#00eaffaa;
+ color:#fff;
 }
 
 .tab-btn.active{
- color:#02101a;
  border-color:transparent;
- background:linear-gradient(90deg,#00eaff,#9d6cff);
- box-shadow:0 0 18px #00eaff66;
+ color:#02101a;
+ background:linear-gradient(90deg,#00eaff,#8b7cff);
+ box-shadow:0 0 18px #00eaff77;
 }
 
-button#start{
+.panel{
+ animation:fadeIn .25s ease;
+}
+
+@keyframes fadeIn{
+ from{
+  opacity:0;
+  transform:translateY(6px);
+ }
+ to{
+  opacity:1;
+  transform:translateY(0);
+ }
+}
+
+.card h1{
+ margin:4px 0;
+ color:#fff;
+ font-size:42px;
+ letter-spacing:4px;
+ text-shadow:0 0 20px #00eaff;
+}
+
+.shopTitle{
+ margin:3px 0 12px;
+ color:#a6f4ff;
+ font-size:19px;
+ letter-spacing:2px;
+ text-shadow:0 0 15px #00eaff88;
+}
+
+.card p{
+ margin:0 0 17px;
+ color:#a8bad0;
+}
+
+#start{
  width:100%;
  padding:14px;
  border:0;
  border-radius:14px;
- background:linear-gradient(90deg,#00eaff,#9d6cff);
- color:#02101a;
+ background:linear-gradient(90deg,#00eaff,#8b7cff);
+ color:#04101d;
  font-size:17px;
- font-weight:bold;
+ font-weight:900;
  cursor:pointer;
+ box-shadow:0 0 22px #00eaff55;
+ transition:.2s;
+}
+
+#start:hover{
+ transform:translateY(-2px);
+ box-shadow:0 0 30px #00eaffaa;
+}
+
+.hint{
+ margin-top:15px;
+ color:#7188a4;
+ font-size:12px;
+ line-height:1.6;
 }
 
 .coinBalance{
  display:inline-flex;
  align-items:center;
- gap:8px;
+ gap:7px;
  margin-bottom:15px;
- padding:8px 15px;
- border:1px solid #ffd60066;
+ padding:8px 14px;
+ border:1px solid #ffd60055;
  border-radius:13px;
- background:#171106;
+ background:#171104;
  color:#ffd600;
- font-weight:bold;
+ font-weight:800;
+ box-shadow:0 0 15px #ffd60022;
 }
 
 .coinIcon{
- width:16px;
- height:16px;
+ width:14px;
+ height:14px;
  border-radius:50%;
- background:radial-gradient(circle at 30% 25%,#fff,#ffd600 48%,#a87800);
+ background:radial-gradient(circle at 32% 28%,#fff9d6,#ffd600 52%,#bc8700);
  box-shadow:0 0 8px #ffd600;
 }
 
-.grid{
+/* ───────────────── Карточки магазина ───────────────── */
+
+.shopGrid{
  display:grid;
  grid-template-columns:repeat(3,1fr);
  gap:10px;
 }
 
-.tailGrid,.backgroundGrid{
+.tailGrid{
  display:grid;
  grid-template-columns:repeat(2,1fr);
  gap:10px;
 }
 
-.itemCard{
+.backgroundGrid{
+ display:grid;
+ grid-template-columns:repeat(2,1fr);
+ gap:10px;
+}
+
+.shopCard{
  position:relative;
- min-height:116px;
- padding:12px 6px;
- border:1px solid #ffffff22;
+ min-height:128px;
+ padding:12px 7px 10px;
+ overflow:hidden;
+ display:flex;
+ flex-direction:column;
+ align-items:center;
+ justify-content:flex-end;
+ gap:7px;
+ border:1px solid #ffffff1d;
  border-radius:15px;
- background:#0a1830;
- cursor:pointer;
+ background:#0b1830;
  transition:.2s;
 }
 
-.itemCard:hover{
+.shopCard:hover{
  transform:translateY(-3px);
- border-color:#00eaffaa;
-}
-
-.itemCard.selected{
  border-color:var(--accent,#00eaff);
- box-shadow:0 0 22px var(--accent,#00eaff88);
 }
 
-.itemCard.locked{opacity:.8}
+.shopCard.selected{
+ border-color:var(--accent,#00eaff);
+ box-shadow:0 0 22px var(--accent,#00eaff),inset 0 0 15px #ffffff0b;
+}
 
-.itemName{
- margin-top:7px;
- color:#d9f6ff;
+.shopCard.locked{
+ opacity:.88;
+}
+
+.cardName{
+ color:#d8efff;
  font-size:11px;
- font-weight:bold;
+ font-weight:800;
 }
 
-.price{
+.cardPrice{
  display:flex;
- justify-content:center;
  align-items:center;
  gap:4px;
- margin-top:7px;
  color:#ffd600;
  font-size:11px;
- font-weight:bold;
+ font-weight:900;
 }
 
-.price .coinIcon{
- width:11px;
- height:11px;
+.cardPrice .coinIcon{
+ width:10px;
+ height:10px;
 }
 
-.check{
- position:absolute;
- top:6px;
- right:8px;
+.status{
+ min-height:18px;
  color:#7effa0;
- opacity:0;
+ font-size:10px;
+ font-weight:800;
 }
 
-.selected .check{opacity:1}
+.buyBtn,
+.selectBtn,
+.selectedBtn{
+ padding:7px 9px;
+ border:0;
+ border-radius:8px;
+ color:#02101a;
+ font-size:10px;
+ font-weight:900;
+ cursor:pointer;
+}
+
+.buyBtn{
+ background:linear-gradient(90deg,#ffd600,#ff9d27);
+}
+
+.selectBtn{
+ background:linear-gradient(90deg,#00eaff,#8b7cff);
+}
+
+.selectedBtn{
+ color:#07310f;
+ background:#7effa0;
+ cursor:default;
+}
 
 .lock{
  position:absolute;
- top:6px;
+ top:7px;
  right:8px;
+ font-size:12px;
 }
 
 .planeIcon{
- width:44px;
- height:25px;
- margin:8px auto 0;
+ width:46px;
+ height:27px;
+ margin-bottom:6px;
  background:var(--plane,#fff);
- clip-path:polygon(100% 50%,22% 4%,40% 42%,0 48%,40% 58%,22% 96%);
- filter:drop-shadow(0 0 9px var(--accent,#00eaff));
+ clip-path:polygon(100% 50%,24% 3%,41% 41%,0 48%,41% 59%,24% 97%);
+ filter:drop-shadow(0 0 8px var(--accent,#00eaff));
 }
 
 .tailPreview{
  position:relative;
- height:38px;
- margin:5px auto;
+ width:95px;
+ height:34px;
+ margin-bottom:3px;
 }
 
 .tailLine{
  position:absolute;
- top:18px;
- left:9%;
- width:73%;
- height:7px;
+ top:14px;
+ left:1px;
+ width:67px;
+ height:8px;
  border-radius:50%;
- background:linear-gradient(90deg,transparent,var(--accent),#fff);
- box-shadow:0 0 15px var(--accent);
+ background:linear-gradient(90deg,transparent,var(--accent,#00eaff));
+ box-shadow:0 0 12px var(--accent,#00eaff);
 }
 
 .tailPlane{
  position:absolute;
- top:10px;
- right:7%;
- width:34px;
- height:20px;
- background:var(--accent);
- clip-path:polygon(100% 50%,22% 4%,40% 42%,0 48%,40% 58%,22% 96%);
- filter:drop-shadow(0 0 8px var(--accent));
+ top:9px;
+ right:0;
+ width:36px;
+ height:19px;
+ background:var(--accent,#fff);
+ clip-path:polygon(100% 50%,24% 3%,41% 41%,0 48%,41% 59%,24% 97%);
+ filter:drop-shadow(0 0 7px var(--accent,#00eaff));
 }
+
+/* ───────────────── Карточки фонов ───────────────── */
 
 .backgroundCard{
- min-height:145px;
- overflow:hidden;
- text-align:left;
+ min-height:176px;
+ padding:0;
+ justify-content:flex-end;
+ align-items:stretch;
+ text-align:center;
 }
 
-.backgroundPreview{
- height:82px;
- margin:-12px -6px 7px;
- border-radius:12px 12px 5px 5px;
+.bgPreview{
+ position:absolute;
+ inset:0;
+ overflow:hidden;
+ background:#030716;
+}
+
+.bgPreview.default{
+ background:
+ radial-gradient(circle at 20% 20%,#dfffff 0 1px,transparent 2px),
+ radial-gradient(circle at 75% 32%,#dfffff 0 1px,transparent 2px),
+ radial-gradient(circle at 44% 50%,#00eaff 0 1px,transparent 2px),
+ linear-gradient(160deg,#03091e,#0a1d3b);
+}
+
+.bgPreview.solar{
+ background:
+ radial-gradient(circle at 24% 53%,#fff5ae 0 5%,#ff9c2a 7%,#e9492544 15%,transparent 23%),
+ radial-gradient(ellipse at 25% 53%,transparent 0 24%,#00eaff99 25% 26%,transparent 27%),
+ radial-gradient(ellipse at 25% 53%,transparent 0 41%,#ff3f9188 42% 43%,transparent 44%),
+ linear-gradient(145deg,#030512,#150d2a);
+}
+
+.bgPreview.earth{
+ background:
+ radial-gradient(ellipse at 50% 113%,#0d7cbb 0 32%,#00eaff 34%,#073057 36%,#020716 63%);
+}
+
+.bgPreview.sun{
+ background:
+ radial-gradient(circle at 65% 43%,#fff7be 0 8%,#ffd342 14%,#ff762c99 24%,transparent 43%),
+ linear-gradient(145deg,#180614,#050516 65%);
+}
+
+.bgInfo{
  position:relative;
- overflow:hidden;
+ z-index:1;
+ padding:9px 6px;
+ background:linear-gradient(transparent,#020611ee 38%);
 }
 
-.backgroundPreview.default{
- background:
- radial-gradient(circle at 20% 25%,#fff 0 1px,transparent 2px),
- radial-gradient(circle at 75% 35%,#00eaff 0 1px,transparent 2px),
- radial-gradient(circle at 55% 75%,#fff 0 1px,transparent 2px),
- linear-gradient(135deg,#020516,#092449);
+.bgInfo .cardName{
+ min-height:25px;
+ display:flex;
+ align-items:center;
+ justify-content:center;
 }
 
-.backgroundPreview.solar{
- background:
- radial-gradient(circle at 22% 45%,#fff4a0 0 7%,#ff9c2d 12%,transparent 25%),
- radial-gradient(ellipse at 22% 45%,transparent 0 27%,#00eaffaa 28% 29%,transparent 30%),
- radial-gradient(ellipse at 22% 45%,transparent 0 43%,#ff3f91aa 44% 45%,transparent 46%),
- #020516;
-}
-
-.backgroundPreview.earth{
- background:
- radial-gradient(ellipse at 50% 125%,#0b79bf 0 38%,#00eaff 39% 40%,#092d5c 42% 100%);
-}
-
-.backgroundPreview.sun{
- background:
- radial-gradient(circle at 50% 50%,#fffbd0 0 8%,#ffd83d 16%,#ff713b99 30%,transparent 58%),
- linear-gradient(135deg,#230d19,#020516 75%);
-}
-
-.backgroundPreview.galaxy{
- background:
- radial-gradient(circle at 70% 28%,#ff3f91aa,transparent 30%),
- radial-gradient(circle at 28% 72%,#8b7cffbb,transparent 32%),
- linear-gradient(135deg,#020516,#180c37);
-}
-
-.hint{
- margin-top:14px;
- color:#7188a4;
- font-size:11px;
- line-height:1.55;
-}
-
-.shake{animation:shake .3s}
-@keyframes shake{
- 25%{transform:translateX(-5px)}
- 75%{transform:translateX(5px)}
-}
+/* ───────────────── Всплывающая награда ───────────────── */
 
 .coinPopup{
  position:fixed;
- z-index:20;
+ z-index:50;
  pointer-events:none;
  color:#ffd600;
  font-size:20px;
- font-weight:bold;
- text-shadow:0 0 12px #ffd600;
- animation:popup .8s forwards;
+ font-weight:900;
+ text-shadow:0 0 13px #ffd600,0 0 4px #fff;
+ animation:coinPop .8s ease forwards;
 }
 
-@keyframes popup{
- from{opacity:0;transform:translate(-50%,0) scale(.7)}
- 15%{opacity:1;transform:translate(-50%,-8px) scale(1.1)}
- to{opacity:0;transform:translate(-50%,-48px)}
+@keyframes coinPop{
+ 0%{
+  opacity:0;
+  transform:translate(-50%,0) scale(.7);
+ }
+ 18%{
+  opacity:1;
+  transform:translate(-50%,-8px) scale(1.15);
+ }
+ 100%{
+  opacity:0;
+  transform:translate(-50%,-50px) scale(1);
+ }
 }
 
 @media(max-width:430px){
- .tab-btn{font-size:8px}
- .grid{grid-template-columns:repeat(2,1fr)}
- .card h1{font-size:34px}
+ .card{
+  padding:16px 12px;
+ }
+
+ .tab-btn{
+  font-size:9px;
+ }
+
+ .box{
+  min-width:65px;
+  padding:6px 8px;
+ }
+
+ .num{
+  font-size:18px;
+ }
 }
 </style>
 </head>
@@ -370,12 +500,17 @@ button#start{
 
  <div class="box">
   <div class="small">СКОРОСТЬ</div>
-  <div class="num" id="speedHUD">×1.00</div>
+  <div class="num" id="speedLvl" style="color:#7eff8b">×1.00</div>
+ </div>
+
+ <div class="box">
+  <div class="small">ТУРБО</div>
+  <div class="num" id="turboLvl" style="color:#7ff2ff">—</div>
  </div>
 
  <div class="box">
   <div class="small">БОЧКА</div>
-  <div class="num" id="barrelHUD">0/10</div>
+  <div class="num" id="barrelCount" style="color:#ffbc4a">0/10</div>
  </div>
 
  <div class="box">
@@ -394,7 +529,7 @@ button#start{
    <button class="tab-btn" data-tab="backgrounds">ФОНЫ</button>
   </div>
 
-  <section id="panel-main">
+  <section class="panel" id="panel-main">
    <h1 id="title">NEON SKY</h1>
    <p id="subtitle">DRONE RUN</p>
 
@@ -403,34 +538,35 @@ button#start{
     <span id="coinsMenu">0</span> Coins
    </div>
 
-   <button id="start">Взлететь ✈️</button>
+   <button id="start">ВЗЛЕТЕТЬ ✈️</button>
 
    <div class="hint">
-    Тап / клик / Space — полёт вверх.<br>
-    10 кликов — бочка и неуязвимость на 3 секунды.<br>
-    Каждые 10 очков скорость дронов увеличивается на 10%.<br>
-    Монеты появляются каждые 3–7 очков и дают от 1 до 3 Coins.
+    Тап / клик / Space — вверх<br>
+    10 кликов = бочка и неуязвимость на 3 секунды<br>
+    Каждые 10 очков = +10% скорости дронов<br>
+    Буст-сфера: +10 очков и ускорение на 3 секунды<br>
+    Монеты появляются раз в 3–7 очков и дают 1–3 Coins
    </div>
   </section>
 
-  <section id="panel-colors" class="hidden">
-   <h2>ЦВЕТА САМОЛЁТА</h2>
+  <section class="panel hidden" id="panel-colors">
+   <h2 class="shopTitle">ЦВЕТА САМОЛЁТА</h2>
 
    <div class="coinBalance">
     <div class="coinIcon"></div>
     <span id="coinsColors">0</span> Coins
    </div>
 
-   <div class="grid" id="colorGrid"></div>
+   <div class="shopGrid" id="colorGrid"></div>
 
    <div class="hint">
-    Белый цвет бесплатный.<br>
+    Белый цвет доступен бесплатно.<br>
     Остальные цвета стоят 15 Coins.
    </div>
   </section>
 
-  <section id="panel-tails" class="hidden">
-   <h2>✈️ ХВОСТЫ</h2>
+  <section class="panel hidden" id="panel-tails">
+   <h2 class="shopTitle">✈️ НЕОНОВЫЕ ХВОСТЫ</h2>
 
    <div class="coinBalance">
     <div class="coinIcon"></div>
@@ -440,14 +576,13 @@ button#start{
    <div class="tailGrid" id="tailGrid"></div>
 
    <div class="hint">
-    Неоновый след живёт примерно 1 секунду.<br>
-    Купленные хвосты сохраняются навсегда.<br>
-    Активным может быть только один хвост.
+    Хвост живёт примерно 1 секунду.<br>
+    Все платные хвосты стоят 10 Coins.
    </div>
   </section>
 
-  <section id="panel-backgrounds" class="hidden">
-   <h2>🌌 ФОНЫ</h2>
+  <section class="panel hidden" id="panel-backgrounds">
+   <h2 class="shopTitle">🌌 ФОНЫ</h2>
 
    <div class="coinBalance">
     <div class="coinIcon"></div>
@@ -457,8 +592,8 @@ button#start{
    <div class="backgroundGrid" id="backgroundGrid"></div>
 
    <div class="hint">
-    Каждый платный фон стоит 20 Coins.<br>
-    Купленные фоны сохраняются навсегда.
+    Платные фоны стоят 20 Coins.<br>
+    После покупки фон остаётся доступным навсегда.
    </div>
   </section>
 
@@ -469,40 +604,46 @@ button#start{
 const canvas=document.getElementById("game");
 const ctx=canvas.getContext("2d");
 
-let W=innerWidth;
-let H=innerHeight;
+const scoreEl=document.getElementById("score");
+const bestEl=document.getElementById("best");
+const coinsHUD=document.getElementById("coinsHUD");
+const coinsMenu=document.getElementById("coinsMenu");
+const coinsColors=document.getElementById("coinsColors");
+const coinsTails=document.getElementById("coinsTails");
+const coinsBackgrounds=document.getElementById("coinsBackgrounds");
+const speedLvlEl=document.getElementById("speedLvl");
+const turboLvlEl=document.getElementById("turboLvl");
+const barrelCountEl=document.getElementById("barrelCount");
+const overlay=document.getElementById("overlay");
+const title=document.getElementById("title");
+const subtitle=document.getElementById("subtitle");
+const startBtn=document.getElementById("start");
+
+let W=0;
+let H=0;
 let DPR=1;
 let lastTime=0;
 let time=0;
 let playing=false;
 let score=0;
 let best=Number(localStorage.neonSkyBest||0);
-let speedMultiplier=1;
-let lastSpeedLevel=0;
 let spawnTimer=0;
-let screenShake=0;
-
-const scoreEl=document.getElementById("score");
-const bestEl=document.getElementById("best");
-const speedHUD=document.getElementById("speedHUD");
-const barrelHUD=document.getElementById("barrelHUD");
-const overlay=document.getElementById("overlay");
-const title=document.getElementById("title");
-const subtitle=document.getElementById("subtitle");
-const startButton=document.getElementById("start");
+let shake=0;
 
 bestEl.textContent=best;
 
-/* ══════════════ Coins ══════════════ */
+/* ════════════════════════════════════════
+   СОХРАНЕНИЕ И БАЛАНС COINS
+════════════════════════════════════════ */
 
 let coins=Number(localStorage.neonSkyCoins||0);
 
 function updateCoinsUI(){
- document.getElementById("coinsHUD").textContent=coins;
- document.getElementById("coinsMenu").textContent=coins;
- document.getElementById("coinsColors").textContent=coins;
- document.getElementById("coinsTails").textContent=coins;
- document.getElementById("coinsBackgrounds").textContent=coins;
+ coinsHUD.textContent=coins;
+ coinsMenu.textContent=coins;
+ coinsColors.textContent=coins;
+ coinsTails.textContent=coins;
+ coinsBackgrounds.textContent=coins;
 }
 
 function addCoins(amount){
@@ -510,6 +651,19 @@ function addCoins(amount){
  localStorage.neonSkyCoins=coins;
  updateCoinsUI();
 }
+
+function spendCoins(amount){
+ if(coins<amount){
+  return false;
+ }
+
+ coins-=amount;
+ localStorage.neonSkyCoins=coins;
+ updateCoinsUI();
+ return true;
+}
+
+updateCoinsUI();
 
 function showCoinPopup(x,y,amount){
  const popup=document.createElement("div");
@@ -521,192 +675,224 @@ function showCoinPopup(x,y,amount){
 
  document.body.appendChild(popup);
 
- setTimeout(()=>popup.remove(),800);
+ setTimeout(()=>{
+  popup.remove();
+ },800);
 }
 
-updateCoinsUI();
+/* ════════════════════════════════════════
+   МАГАЗИН ЦВЕТОВ
+════════════════════════════════════════ */
 
-/* ══════════════ Цвета самолёта ══════════════ */
-
-const COLORS={
- white:{name:"Белый",color:"#f5ffff",accent:"#00eaff",price:0},
- green:{name:"Зелёный",color:"#39ff88",accent:"#00ff6a",price:15},
- red:{name:"Красный",color:"#ff4d5e",accent:"#ff1f3d",price:15},
- black:{name:"Чёрный",color:"#262631",accent:"#8b7cff",price:15},
- purple:{name:"Фиолетовый",color:"#b98bff",accent:"#9d6cff",price:15}
+const PLANE_COLORS={
+ white:{name:"Белый",emoji:"⚪",top:"#f4ffff",glow:"#00eaff",price:0},
+ green:{name:"Зелёный",emoji:"🟢",top:"#39ff88",glow:"#00ff76",price:15},
+ red:{name:"Красный",emoji:"🔴",top:"#ff4f65",glow:"#ff2945",price:15},
+ black:{name:"Чёрный",emoji:"⚫",top:"#20202b",glow:"#8b7cff",price:15},
+ purple:{name:"Фиолетовый",emoji:"🟣",top:"#bf8aff",glow:"#ad65ff",price:15}
 };
 
-let ownedColors=JSON.parse(
- localStorage.neonSkyOwnedColors||'["white"]'
-);
+let ownedColors=JSON.parse(localStorage.neonSkyOwnedColors||'["white"]');
+let selectedPlaneColor=localStorage.neonSkyPlaneColor||"white";
 
-let selectedColor=localStorage.neonSkyPlaneColor||"white";
+if(!ownedColors.includes("white")){
+ ownedColors.push("white");
+}
 
-if(!ownedColors.includes("white"))ownedColors.push("white");
-if(!ownedColors.includes(selectedColor))selectedColor="white";
+if(!ownedColors.includes(selectedPlaneColor)){
+ selectedPlaneColor="white";
+}
 
-function buildColorShop(){
+function saveColors(){
+ localStorage.neonSkyOwnedColors=JSON.stringify(ownedColors);
+ localStorage.neonSkyPlaneColor=selectedPlaneColor;
+}
+
+function buildColorGrid(){
  const grid=document.getElementById("colorGrid");
  grid.innerHTML="";
 
- for(const key in COLORS){
-  const item=COLORS[key];
-  const owned=ownedColors.includes(key);
+ for(const id in PLANE_COLORS){
+  const item=PLANE_COLORS[id];
+  const owned=ownedColors.includes(id);
+  const selected=selectedPlaneColor===id;
 
   const card=document.createElement("div");
-  card.className="itemCard"+(key===selectedColor?" selected":"")+(owned?"":" locked");
-  card.style.setProperty("--plane",item.color);
-  card.style.setProperty("--accent",item.accent);
+
+  card.className=
+   "shopCard"+
+   (selected?" selected":"")+
+   (!owned?" locked":"");
+
+  card.style.setProperty("--accent",item.glow);
+  card.style.setProperty("--plane",item.top);
 
   card.innerHTML=`
-   <div class="check">✓</div>
-   ${owned?"":"<div class='lock'>🔒</div>"}
+   ${!owned?'<div class="lock">🔒</div>':""}
    <div class="planeIcon"></div>
-   <div class="itemName">${item.name}</div>
-   ${owned?"":`
-    <div class="price">
-     <div class="coinIcon"></div>${item.price}
-    </div>
-   `}
+   <div class="cardName">${item.emoji} ${item.name}</div>
+   ${
+    !owned
+     ?`<div class="cardPrice"><div class="coinIcon"></div>${item.price}</div>`
+     :`<div class="status">${selected?"ВЫБРАНО":"КУПЛЕНО"}</div>`
+   }
   `;
 
   card.onclick=()=>{
-   if(ownedColors.includes(key)){
-    selectedColor=key;
-    localStorage.neonSkyPlaneColor=selectedColor;
-    buildColorShop();
+   if(ownedColors.includes(id)){
+    selectedPlaneColor=id;
+    saveColors();
+    buildColorGrid();
     return;
    }
 
-   if(coins<item.price){
-    card.classList.add("shake");
-    setTimeout(()=>card.classList.remove("shake"),350);
-    return;
+   if(spendCoins(item.price)){
+    ownedColors.push(id);
+    selectedPlaneColor=id;
+    saveColors();
+    buildColorGrid();
+   }else{
+    card.animate(
+     [
+      {transform:"translateX(0)"},
+      {transform:"translateX(-5px)"},
+      {transform:"translateX(5px)"},
+      {transform:"translateX(0)"}
+     ],
+     {duration:260}
+    );
    }
-
-   coins-=item.price;
-   localStorage.neonSkyCoins=coins;
-
-   ownedColors.push(key);
-   localStorage.neonSkyOwnedColors=JSON.stringify(ownedColors);
-
-   selectedColor=key;
-   localStorage.neonSkyPlaneColor=selectedColor;
-
-   updateCoinsUI();
-   buildColorShop();
   };
 
   grid.appendChild(card);
  }
 }
 
-buildColorShop();
+buildColorGrid();
 
-/* ══════════════ Хвосты ══════════════ */
+/* ════════════════════════════════════════
+   МАГАЗИН ХВОСТОВ
+════════════════════════════════════════ */
 
 const TAILS={
- none:{name:"Без хвоста",accent:"#90a4bb",price:0},
- cyan:{name:"Неон циан",accent:"#00eaff",price:10},
- pink:{name:"Неон розовый",accent:"#ff3f91",price:10},
- purple:{name:"Неон фиолетовый",accent:"#9d6cff",price:10},
- gold:{name:"Неон золото",accent:"#ffd600",price:10},
- rainbow:{name:"Радуга",accent:"#ff55d9",price:10}
+ none:{name:"Без хвоста",emoji:"✖",color:"#8191aa",price:0},
+ cyan:{name:"Неон циан",emoji:"🔵",color:"#00eaff",price:10},
+ pink:{name:"Неон розовый",emoji:"💗",color:"#ff3f91",price:10},
+ purple:{name:"Неон фиолетовый",emoji:"🟣",color:"#a568ff",price:10},
+ gold:{name:"Неон золото",emoji:"🟡",color:"#ffd600",price:10},
+ rainbow:{name:"Радуга",emoji:"🌈",color:"#ff63d8",price:10}
 };
 
-let ownedTails=JSON.parse(
- localStorage.neonSkyOwnedTails||'["none"]'
-);
-
+let ownedTails=JSON.parse(localStorage.neonSkyOwnedTails||'["none"]');
 let selectedTail=localStorage.neonSkySelectedTail||"none";
 
-if(!ownedTails.includes("none"))ownedTails.push("none");
-if(!ownedTails.includes(selectedTail))selectedTail="none";
+if(!ownedTails.includes("none")){
+ ownedTails.push("none");
+}
 
-function buildTailShop(){
+if(!ownedTails.includes(selectedTail)){
+ selectedTail="none";
+}
+
+function saveTails(){
+ localStorage.neonSkyOwnedTails=JSON.stringify(ownedTails);
+ localStorage.neonSkySelectedTail=selectedTail;
+}
+
+function buildTailGrid(){
  const grid=document.getElementById("tailGrid");
  grid.innerHTML="";
 
- for(const key in TAILS){
-  const item=TAILS[key];
-  const owned=ownedTails.includes(key);
+ for(const id in TAILS){
+  const item=TAILS[id];
+  const owned=ownedTails.includes(id);
+  const selected=selectedTail===id;
 
   const card=document.createElement("div");
-  card.className="itemCard"+(key===selectedTail?" selected":"")+(owned?"":" locked");
-  card.style.setProperty("--accent",item.accent);
+
+  card.className=
+   "shopCard"+
+   (selected?" selected":"")+
+   (!owned?" locked":"");
+
+  card.style.setProperty("--accent",item.color);
 
   card.innerHTML=`
-   <div class="check">✓</div>
-   ${owned?"":"<div class='lock'>🔒</div>"}
+   ${!owned?'<div class="lock">🔒</div>':""}
    <div class="tailPreview">
     <div class="tailLine"></div>
     <div class="tailPlane"></div>
    </div>
-   <div class="itemName">${item.name}</div>
-   ${owned?"":`
-    <div class="price">
-     <div class="coinIcon"></div>${item.price}
-    </div>
-   `}
+   <div class="cardName">${item.emoji} ${item.name}</div>
+   ${
+    !owned
+     ?`<div class="cardPrice"><div class="coinIcon"></div>${item.price}</div>`
+     :`<div class="status">${selected?"ВЫБРАНО":"КУПЛЕНО"}</div>`
+   }
   `;
 
   card.onclick=()=>{
-   if(ownedTails.includes(key)){
-    selectedTail=key;
-    localStorage.neonSkySelectedTail=selectedTail;
-    buildTailShop();
+   if(ownedTails.includes(id)){
+    selectedTail=id;
+    saveTails();
+    buildTailGrid();
     return;
    }
 
-   if(coins<item.price){
-    card.classList.add("shake");
-    setTimeout(()=>card.classList.remove("shake"),350);
-    return;
+   if(spendCoins(item.price)){
+    ownedTails.push(id);
+    selectedTail=id;
+    saveTails();
+    buildTailGrid();
+   }else{
+    card.animate(
+     [
+      {transform:"translateX(0)"},
+      {transform:"translateX(-5px)"},
+      {transform:"translateX(5px)"},
+      {transform:"translateX(0)"}
+     ],
+     {duration:260}
+    );
    }
-
-   coins-=item.price;
-   localStorage.neonSkyCoins=coins;
-
-   ownedTails.push(key);
-   localStorage.neonSkyOwnedTails=JSON.stringify(ownedTails);
-
-   selectedTail=key;
-   localStorage.neonSkySelectedTail=selectedTail;
-
-   updateCoinsUI();
-   buildTailShop();
   };
 
   grid.appendChild(card);
  }
 }
 
-buildTailShop();
+buildTailGrid();
 
-/* ══════════════ Фоны ══════════════ */
+/* ════════════════════════════════════════
+   МАГАЗИН ФОНОВ
+════════════════════════════════════════ */
 
 const BACKGROUNDS={
  default:{
   name:"Неоновое небо",
-  className:"default",
+  preview:"default",
+  color:"#00eaff",
   price:0
  },
 
  solar:{
   name:"Рядом с Солнечной системой",
-  className:"solar",
+  preview:"solar",
+  color:"#ffae45",
   price:20
  },
 
  earth:{
   name:"В атмосфере Земли",
-  className:"earth",
+  preview:"earth",
+  color:"#00eaff",
   price:20
  },
 
  sun:{
   name:"Рядом с Солнцем",
-  className:"sun",
+  preview:"sun",
+  color:"#ff7b36",
   price:20
  }
 };
@@ -726,416 +912,141 @@ if(!ownedBackgrounds.includes(selectedBackground)){
  selectedBackground="default";
 }
 
-function buildBackgroundShop(){
+function saveBackgrounds(){
+ localStorage.neonSkyOwnedBackgrounds=JSON.stringify(ownedBackgrounds);
+ localStorage.neonSkySelectedBackground=selectedBackground;
+}
+
+function buildBackgroundGrid(){
  const grid=document.getElementById("backgroundGrid");
  grid.innerHTML="";
 
- for(const key in BACKGROUNDS){
-  const item=BACKGROUNDS[key];
-  const owned=ownedBackgrounds.includes(key);
+ for(const id in BACKGROUNDS){
+  const item=BACKGROUNDS[id];
+  const owned=ownedBackgrounds.includes(id);
+  const selected=selectedBackground===id;
 
   const card=document.createElement("div");
 
   card.className=
-   "itemCard backgroundCard"+
-   (key===selectedBackground?" selected":"")+
-   (owned?"":" locked");
+   "shopCard backgroundCard"+
+   (selected?" selected":"")+
+   (!owned?" locked":"");
 
-  card.style.setProperty(
-   "--accent",
-   key==="sun"?"#ff9c3b":
-   key==="earth"?"#00eaff":
-   key==="solar"?"#ffd600":
-   "#00eaff"
-  );
+  card.style.setProperty("--accent",item.color);
+
+  const action=
+   !owned
+    ?`<button class="buyBtn">КУПИТЬ · ${item.price} 🪙</button>`
+    :selected
+     ?`<button class="selectedBtn">ВЫБРАНО</button>`
+     :`<button class="selectBtn">ВЫБРАТЬ</button>`;
 
   card.innerHTML=`
-   <div class="check">✓</div>
-   ${owned?"":"<div class='lock'>🔒</div>"}
-   <div class="backgroundPreview ${item.className}"></div>
-   <div class="itemName">${item.name}</div>
-   ${owned?"":`
-    <div class="price">
-     <div class="coinIcon"></div>${item.price}
-    </div>
-   `}
+   <div class="bgPreview ${item.preview}"></div>
+   ${!owned?'<div class="lock">🔒</div>':""}
+   <div class="bgInfo">
+    <div class="cardName">${item.name}</div>
+    ${
+     !owned
+      ?`<div class="cardPrice" style="justify-content:center;margin:3px 0">
+          <div class="coinIcon"></div>${item.price} Coins
+        </div>`
+      :`<div class="status">${selected?"АКТИВЕН":"КУПЛЕНО"}</div>`
+    }
+    ${action}
+   </div>
   `;
 
-  card.onclick=()=>{
-   if(ownedBackgrounds.includes(key)){
-    selectedBackground=key;
-    localStorage.neonSkySelectedBackground=selectedBackground;
-    initBackgroundState();
-    buildBackgroundShop();
+  const button=card.querySelector("button");
+
+  button.onclick=(event)=>{
+   event.stopPropagation();
+
+   if(!ownedBackgrounds.includes(id)){
+    if(spendCoins(item.price)){
+     ownedBackgrounds.push(id);
+     selectedBackground=id;
+     saveBackgrounds();
+     buildBackgroundGrid();
+    }else{
+     card.animate(
+      [
+       {transform:"translateX(0)"},
+       {transform:"translateX(-5px)"},
+       {transform:"translateX(5px)"},
+       {transform:"translateX(0)"}
+      ],
+      {duration:260}
+     );
+    }
+
     return;
    }
 
-   if(coins<item.price){
-    card.classList.add("shake");
-    setTimeout(()=>card.classList.remove("shake"),350);
-    return;
-   }
-
-   coins-=item.price;
-   localStorage.neonSkyCoins=coins;
-
-   ownedBackgrounds.push(key);
-   localStorage.neonSkyOwnedBackgrounds=
-    JSON.stringify(ownedBackgrounds);
-
-   selectedBackground=key;
-   localStorage.neonSkySelectedBackground=selectedBackground;
-
-   updateCoinsUI();
-   initBackgroundState();
-   buildBackgroundShop();
+   selectedBackground=id;
+   saveBackgrounds();
+   buildBackgroundGrid();
   };
 
   grid.appendChild(card);
  }
 }
 
-buildBackgroundShop();
+buildBackgroundGrid();
 
-/* ══════════════ Вкладки ══════════════ */
-
-const panels={
- main:document.getElementById("panel-main"),
- colors:document.getElementById("panel-colors"),
- tails:document.getElementById("panel-tails"),
- backgrounds:document.getElementById("panel-backgrounds")
-};
+/* ════════════════════════════════════════
+   ВКЛАДКИ
+════════════════════════════════════════ */
 
 document.querySelectorAll(".tab-btn").forEach(button=>{
  button.onclick=()=>{
-  document.querySelectorAll(".tab-btn").forEach(btn=>{
-   btn.classList.remove("active");
+  const tab=button.dataset.tab;
+
+  document.querySelectorAll(".tab-btn").forEach(item=>{
+   item.classList.toggle("active",item===button);
   });
 
-  button.classList.add("active");
+  document.getElementById("panel-main").classList.toggle(
+   "hidden",
+   tab!=="main"
+  );
 
-  for(const key in panels){
-   panels[key].classList.toggle(
-    "hidden",
-    key!==button.dataset.tab
-   );
-  }
+  document.getElementById("panel-colors").classList.toggle(
+   "hidden",
+   tab!=="colors"
+  );
+
+  document.getElementById("panel-tails").classList.toggle(
+   "hidden",
+   tab!=="tails"
+  );
+
+  document.getElementById("panel-backgrounds").classList.toggle(
+   "hidden",
+   tab!=="backgrounds"
+  );
  };
 });
 
-/* ══════════════ Фоновые состояния ══════════════ */
+/* ════════════════════════════════════════
+   CANVAS И ИГРОВЫЕ ОБЪЕКТЫ
+════════════════════════════════════════ */
 
-let bgTime=0;
+function resize(){
+ DPR=Math.min(window.devicePixelRatio||1,2);
+ W=innerWidth;
+ H=innerHeight;
 
-const solarState={
- planets:[],
- stars:[]
-};
+ canvas.width=W*DPR;
+ canvas.height=H*DPR;
 
-const earthState={
- clouds:[],
- offset:0
-};
+ ctx.setTransform(DPR,0,0,DPR,0,0);
 
-const sunState={
- particles:[]
-};
-
-function initBackgroundState(){
- solarState.planets=[];
- solarState.stars=[];
-
- for(let i=0;i<80;i++){
-  solarState.stars.push({
-   x:Math.random()*W,
-   y:Math.random()*H,
-   r:.4+Math.random()*1.5,
-   speed:5+Math.random()*18,
-   alpha:.25+Math.random()*.7
-  });
- }
-
- solarState.planets=[
-  {orbit:95,size:5,color:"#00eaff",speed:.8,phase:0},
-  {orbit:145,size:8,color:"#ff3f91",speed:.48,phase:2},
-  {orbit:205,size:11,color:"#9d6cff",speed:.27,phase:4},
-  {orbit:270,size:14,color:"#ffbd42",speed:.16,phase:1}
- ];
-
- earthState.clouds=[];
-
- for(let i=0;i<12;i++){
-  earthState.clouds.push({
-   x:Math.random()*W,
-   y:H*.67+Math.random()*H*.2,
-   w:50+Math.random()*90,
-   h:10+Math.random()*18,
-   speed:8+Math.random()*18,
-   alpha:.15+Math.random()*.3
-  });
- }
-
- sunState.particles=[];
-
- for(let i=0;i<45;i++){
-  const angle=Math.random()*Math.PI*2;
-  const distance=65+Math.random()*100;
-
-  sunState.particles.push({
-   angle,
-   distance,
-   speed:.2+Math.random()*.5,
-   size:1+Math.random()*3
-  });
- }
+ initBackgroundState();
 }
 
-function drawStars(dt,alpha=.8){
- for(const star of solarState.stars){
-  star.x-=star.speed*dt;
-
-  if(star.x<-5)star.x=W+5;
-
-  ctx.globalAlpha=star.alpha*alpha;
-  ctx.fillStyle="#d9fbff";
-
-  ctx.beginPath();
-  ctx.arc(star.x,star.y,star.r,0,Math.PI*2);
-  ctx.fill();
- }
-
- ctx.globalAlpha=1;
-}
-
-function drawBackgroundDefault(dt){
- const gradient=ctx.createLinearGradient(0,0,0,H);
-
- gradient.addColorStop(0,"#020516");
- gradient.addColorStop(.6,"#071936");
- gradient.addColorStop(1,"#02030b");
-
- ctx.fillStyle=gradient;
- ctx.fillRect(0,0,W,H);
-
- drawStars(dt);
-
- ctx.strokeStyle="#00eaff1c";
- ctx.lineWidth=1;
-
- for(let y=H*.72;y<H;y+=28){
-  ctx.beginPath();
-  ctx.moveTo(0,y);
-  ctx.lineTo(W,y);
-  ctx.stroke();
- }
-}
-
-function drawBackgroundSolar(dt){
- const gradient=ctx.createLinearGradient(0,0,W,H);
-
- gradient.addColorStop(0,"#01030e");
- gradient.addColorStop(.5,"#07122d");
- gradient.addColorStop(1,"#02030a");
-
- ctx.fillStyle=gradient;
- ctx.fillRect(0,0,W,H);
-
- drawStars(dt,.7);
-
- const sx=W*.25;
- const sy=H*.43;
-
- ctx.save();
- ctx.translate(sx,sy);
- ctx.rotate(bgTime*.05);
-
- ctx.shadowBlur=25;
- ctx.shadowColor="#ffad35";
- ctx.fillStyle="#ffb52e";
-
- ctx.beginPath();
- ctx.arc(0,0,34+Math.sin(bgTime*2)*2,0,Math.PI*2);
- ctx.fill();
-
- ctx.shadowBlur=0;
- ctx.fillStyle="#fff1a0";
-
- ctx.beginPath();
- ctx.arc(-8,-8,17,0,Math.PI*2);
- ctx.fill();
-
- ctx.restore();
-
- for(const planet of solarState.planets){
-  const angle=bgTime*planet.speed+planet.phase;
-  const x=sx+Math.cos(angle)*planet.orbit;
-  const y=sy+Math.sin(angle)*planet.orbit*.48;
-
-  ctx.save();
-  ctx.strokeStyle=planet.color+"55";
-  ctx.lineWidth=1;
-  ctx.beginPath();
-  ctx.ellipse(sx,sy,planet.orbit,planet.orbit*.48,0,0,Math.PI*2);
-  ctx.stroke();
-
-  ctx.shadowBlur=14;
-  ctx.shadowColor=planet.color;
-  ctx.fillStyle=planet.color;
-
-  ctx.beginPath();
-  ctx.arc(x,y,planet.size,0,Math.PI*2);
-  ctx.fill();
-  ctx.restore();
- }
-}
-
-function drawBackgroundEarth(dt){
- const gradient=ctx.createLinearGradient(0,0,0,H);
-
- gradient.addColorStop(0,"#020516");
- gradient.addColorStop(.58,"#071c3c");
- gradient.addColorStop(1,"#063e69");
-
- ctx.fillStyle=gradient;
- ctx.fillRect(0,0,W,H);
-
- drawStars(dt,.45);
-
- earthState.offset-=dt*12;
-
- const earthX=W*.5+Math.sin(bgTime*.18)*18;
- const earthY=H*1.12;
- const earthR=Math.max(W,H)*.72;
-
- ctx.save();
-
- ctx.shadowBlur=35;
- ctx.shadowColor="#00eaff";
- ctx.fillStyle="#075b9e";
-
- ctx.beginPath();
- ctx.ellipse(earthX,earthY,earthR,earthR*.42,0,0,Math.PI*2);
- ctx.fill();
-
- ctx.shadowBlur=0;
- ctx.strokeStyle="#3ceaff";
- ctx.lineWidth=5;
-
- ctx.beginPath();
- ctx.ellipse(earthX,earthY,earthR,earthR*.42,0,Math.PI,Math.PI*2);
- ctx.stroke();
-
- ctx.restore();
-
- for(const cloud of earthState.clouds){
-  cloud.x-=cloud.speed*dt;
-
-  if(cloud.x<-cloud.w){
-   cloud.x=W+cloud.w;
-  }
-
-  ctx.save();
-  ctx.globalAlpha=cloud.alpha;
-  ctx.fillStyle="#d6f7ff";
-  ctx.shadowBlur=12;
-  ctx.shadowColor="#b8efff";
-
-  ctx.beginPath();
-  ctx.ellipse(
-   cloud.x+earthState.offset%W,
-   cloud.y,
-   cloud.w,
-   cloud.h,
-   0,
-   0,
-   Math.PI*2
-  );
-  ctx.fill();
-
-  ctx.restore();
- }
-
- ctx.globalAlpha=1;
-}
-
-function drawBackgroundSun(dt){
- const gradient=ctx.createLinearGradient(0,0,W,H);
-
- gradient.addColorStop(0,"#150719");
- gradient.addColorStop(.45,"#09091d");
- gradient.addColorStop(1,"#02030b");
-
- ctx.fillStyle=gradient;
- ctx.fillRect(0,0,W,H);
-
- drawStars(dt,.45);
-
- const x=W*.78;
- const y=H*.38;
- const pulse=1+Math.sin(bgTime*2.3)*.035;
-
- ctx.save();
- ctx.translate(x,y);
- ctx.scale(pulse,pulse);
-
- const glow=ctx.createRadialGradient(0,0,8,0,0,170);
- glow.addColorStop(0,"#fffbd0");
- glow.addColorStop(.12,"#ffd94d");
- glow.addColorStop(.35,"#ff8c2e88");
- glow.addColorStop(1,"transparent");
-
- ctx.fillStyle=glow;
- ctx.globalAlpha=.65;
-
- ctx.beginPath();
- ctx.arc(0,0,180,0,Math.PI*2);
- ctx.fill();
-
- ctx.globalAlpha=1;
- ctx.shadowBlur=25;
- ctx.shadowColor="#ffab32";
- ctx.fillStyle="#ffb52e";
-
- ctx.beginPath();
- ctx.arc(0,0,57,0,Math.PI*2);
- ctx.fill();
-
- ctx.fillStyle="#fff0a0";
- ctx.shadowBlur=8;
-
- ctx.beginPath();
- ctx.arc(-15,-14,28,0,Math.PI*2);
- ctx.fill();
-
- ctx.restore();
-
- for(const particle of sunState.particles){
-  particle.angle+=particle.speed*dt;
-
-  const px=x+Math.cos(particle.angle)*particle.distance;
-  const py=y+Math.sin(particle.angle)*particle.distance*.6;
-
-  ctx.globalAlpha=.15+Math.sin(bgTime*3+particle.angle)*.12;
-  ctx.fillStyle="#ffcf55";
-  ctx.shadowBlur=10;
-  ctx.shadowColor="#ff9d35";
-
-  ctx.beginPath();
-  ctx.arc(px,py,particle.size,0,Math.PI*2);
-  ctx.fill();
- }
-
- ctx.globalAlpha=1;
-}
-
-function drawBackground(dt){
- if(selectedBackground==="solar")drawBackgroundSolar(dt);
- else if(selectedBackground==="earth")drawBackgroundEarth(dt);
- else if(selectedBackground==="sun")drawBackgroundSun(dt);
- else drawBackgroundDefault(dt);
-}
-
-/* ══════════════ Самолёт, дроны и предметы ══════════════ */
+addEventListener("resize",resize);
 
 const plane={
  x:0,
@@ -1147,93 +1058,594 @@ const plane={
 let drones=[];
 let particles=[];
 let coinItem=null;
-let nextCoinScore=0;
+let boostItem=null;
+
+const stars=Array.from({length:150},()=>({
+ x:Math.random(),
+ y:Math.random(),
+ s:.4+Math.random()*1.8,
+ v:.25+Math.random()*.8
+}));
+
+const solarState={
+ planets:[],
+ stars:[]
+};
+
+const earthState={
+ clouds:[]
+};
+
+const sunState={
+ flares:[]
+};
+
+function initBackgroundState(){
+ solarState.planets=Array.from({length:5},(_,i)=>({
+  orbit:70+i*37,
+  speed:.15+i*.045,
+  angle:Math.random()*Math.PI*2,
+  r:4+i*1.7,
+  color:["#00eaff","#ff3f91","#ffd600","#8b7cff","#39ff88"][i]
+ }));
+
+ solarState.stars=Array.from({length:90},()=>({
+  x:Math.random()*W,
+  y:Math.random()*H,
+  s:.5+Math.random()*1.7,
+  speed:8+Math.random()*22
+ }));
+
+ earthState.clouds=Array.from({length:15},()=>({
+  x:Math.random()*W,
+  y:H*.67+Math.random()*H*.28,
+  w:70+Math.random()*140,
+  h:9+Math.random()*18,
+  speed:6+Math.random()*13,
+  alpha:.04+Math.random()*.1
+ }));
+
+ sunState.flares=Array.from({length:45},()=>({
+  angle:Math.random()*Math.PI*2,
+  dist:70+Math.random()*200,
+  speed:.2+Math.random()*.8,
+  size:1+Math.random()*3,
+  phase:Math.random()*Math.PI*2
+ }));
+}
+
+resize();
+
+/* ════════════════════════════════════════
+   ХВОСТ САМОЛЁТА
+════════════════════════════════════════ */
+
+const TRAIL_DURATION=1;
 let trailPoints=[];
 let trailTimer=0;
+
+function resetTrail(){
+ trailPoints=[];
+ trailTimer=0;
+}
+
+function updateTrail(dt,scrollSpeed){
+ if(selectedTail==="none"){
+  trailPoints=[];
+  return;
+ }
+
+ trailTimer-=dt;
+
+ if(trailTimer<=0){
+  trailPoints.push({
+   x:plane.x-20,
+   y:plane.y,
+   age:0,
+   hue:(time*100)%360
+  });
+
+  trailTimer=.025;
+ }
+
+ for(const point of trailPoints){
+  point.age+=dt;
+  point.x-=scrollSpeed*dt;
+ }
+
+ trailPoints=trailPoints.filter(point=>{
+  return point.age<TRAIL_DURATION&&point.x>-120;
+ });
+}
+
+function getTailColor(point){
+ if(selectedTail==="rainbow"){
+  return `hsl(${(point.hue+time*70)%360},100%,64%)`;
+ }
+
+ return TAILS[selectedTail].color;
+}
+
+function drawTrail(){
+ if(selectedTail==="none"||trailPoints.length<2){
+  return;
+ }
+
+ ctx.save();
+ ctx.lineCap="round";
+ ctx.lineJoin="round";
+
+ for(let i=1;i<trailPoints.length;i++){
+  const a=trailPoints[i-1];
+  const b=trailPoints[i];
+
+  const life=1-b.age/TRAIL_DURATION;
+
+  if(life<=0){
+   continue;
+  }
+
+  const color=getTailColor(b);
+
+  ctx.globalAlpha=Math.pow(life,1.8)*.82;
+  ctx.strokeStyle=color;
+  ctx.lineWidth=2+life*12;
+  ctx.shadowBlur=10+life*16;
+  ctx.shadowColor=color;
+
+  ctx.beginPath();
+  ctx.moveTo(a.x,a.y);
+  ctx.lineTo(b.x,b.y);
+  ctx.stroke();
+ }
+
+ ctx.restore();
+}
+
+/* ════════════════════════════════════════
+   ФОНЫ — ОТРИСОВКА
+════════════════════════════════════════ */
+
+function drawGrid(){
+ ctx.strokeStyle="#00eaff18";
+ ctx.lineWidth=1;
+
+ for(let y=H*.73;y<H;y+=29){
+  ctx.beginPath();
+  ctx.moveTo(0,y);
+  ctx.lineTo(W,y);
+  ctx.stroke();
+ }
+
+ for(let x=-W;x<W*2;x+=75){
+  ctx.beginPath();
+  ctx.moveTo(W*.5,H*.67);
+  ctx.lineTo(x,H);
+  ctx.stroke();
+ }
+}
+
+function drawBackgroundDefault(dt){
+ const gradient=ctx.createLinearGradient(0,0,0,H);
+
+ gradient.addColorStop(0,"#020516");
+ gradient.addColorStop(.58,"#071a35");
+ gradient.addColorStop(1,"#02030a");
+
+ ctx.fillStyle=gradient;
+ ctx.fillRect(0,0,W,H);
+
+ for(const star of stars){
+  star.x-=dt*.025*star.v;
+
+  if(star.x<0){
+   star.x=1;
+  }
+
+  ctx.globalAlpha=.25+star.v*.55;
+  ctx.fillStyle="#d9ffff";
+
+  ctx.beginPath();
+  ctx.arc(star.x*W,star.y*H,star.s,0,Math.PI*2);
+  ctx.fill();
+ }
+
+ ctx.globalAlpha=1;
+ drawGrid();
+}
+
+function drawBackgroundSolar(dt){
+ const gradient=ctx.createLinearGradient(0,0,W,H);
+
+ gradient.addColorStop(0,"#040515");
+ gradient.addColorStop(.55,"#160d2f");
+ gradient.addColorStop(1,"#040715");
+
+ ctx.fillStyle=gradient;
+ ctx.fillRect(0,0,W,H);
+
+ for(const star of solarState.stars){
+  star.x-=star.speed*dt;
+
+  if(star.x<-3){
+   star.x=W+3;
+   star.y=Math.random()*H;
+  }
+
+  ctx.globalAlpha=.25+star.s*.22;
+  ctx.fillStyle="#dfffff";
+
+  ctx.beginPath();
+  ctx.arc(star.x,star.y,star.s,0,Math.PI*2);
+  ctx.fill();
+ }
+
+ const sx=W*.76;
+ const sy=H*.22;
+ const sunR=Math.min(W,H)*.075;
+
+ ctx.globalAlpha=.18;
+ ctx.fillStyle="#ff8d37";
+ ctx.shadowBlur=65;
+ ctx.shadowColor="#ff7430";
+
+ ctx.beginPath();
+ ctx.arc(sx,sy,sunR*2.1,0,Math.PI*2);
+ ctx.fill();
+
+ ctx.globalAlpha=1;
+ ctx.shadowBlur=28;
+ ctx.shadowColor="#ffd44e";
+
+ const sunGradient=ctx.createRadialGradient(
+  sx-sunR*.25,
+  sy-sunR*.25,
+  sunR*.1,
+  sx,
+  sy,
+  sunR
+ );
+
+ sunGradient.addColorStop(0,"#fffbd2");
+ sunGradient.addColorStop(.48,"#ffd64a");
+ sunGradient.addColorStop(1,"#ff7f2d");
+
+ ctx.fillStyle=sunGradient;
+
+ ctx.beginPath();
+ ctx.arc(sx,sy,sunR,0,Math.PI*2);
+ ctx.fill();
+
+ ctx.shadowBlur=0;
+
+ for(const planet of solarState.planets){
+  planet.angle+=planet.speed*dt;
+
+  const px=sx+Math.cos(planet.angle)*planet.orbit*1.7;
+  const py=sy+Math.sin(planet.angle)*planet.orbit*.48;
+
+  ctx.globalAlpha=.28;
+  ctx.strokeStyle=planet.color;
+  ctx.lineWidth=1;
+
+  ctx.beginPath();
+  ctx.ellipse(sx,sy,planet.orbit*1.7,planet.orbit*.48,0,0,Math.PI*2);
+  ctx.stroke();
+
+  ctx.globalAlpha=1;
+  ctx.shadowBlur=12;
+  ctx.shadowColor=planet.color;
+  ctx.fillStyle=planet.color;
+
+  ctx.beginPath();
+  ctx.arc(px,py,planet.r,0,Math.PI*2);
+  ctx.fill();
+
+  ctx.shadowBlur=0;
+ }
+
+ ctx.globalAlpha=1;
+ drawGrid();
+}
+
+function drawBackgroundEarth(dt){
+ const gradient=ctx.createLinearGradient(0,0,0,H);
+
+ gradient.addColorStop(0,"#02061a");
+ gradient.addColorStop(.55,"#061b35");
+ gradient.addColorStop(1,"#071626");
+
+ ctx.fillStyle=gradient;
+ ctx.fillRect(0,0,W,H);
+
+ for(const star of stars){
+  star.x-=dt*.012*star.v;
+
+  if(star.x<0){
+   star.x=1;
+  }
+
+  ctx.globalAlpha=.2+star.v*.35;
+  ctx.fillStyle="#d9ffff";
+
+  ctx.beginPath();
+  ctx.arc(star.x*W,star.y*H,star.s*.8,0,Math.PI*2);
+  ctx.fill();
+ }
+
+ const earthY=H*1.13+Math.sin(time*.2)*16;
+ const earthR=Math.max(W,H)*.8;
+
+ ctx.globalAlpha=.2;
+ ctx.fillStyle="#00dfff";
+ ctx.shadowBlur=55;
+ ctx.shadowColor="#00dfff";
+
+ ctx.beginPath();
+ ctx.arc(W*.5,earthY,earthR,Math.PI,Math.PI*2);
+ ctx.fill();
+
+ ctx.globalAlpha=1;
+ ctx.shadowBlur=24;
+ ctx.shadowColor="#00eaff";
+
+ const earthGradient=ctx.createRadialGradient(
+  W*.37,
+  earthY-earthR*.58,
+  earthR*.08,
+  W*.5,
+  earthY,
+  earthR
+ );
+
+ earthGradient.addColorStop(0,"#258fce");
+ earthGradient.addColorStop(.45,"#0d5e9b");
+ earthGradient.addColorStop(.8,"#083054");
+ earthGradient.addColorStop(1,"#020a16");
+
+ ctx.fillStyle=earthGradient;
+
+ ctx.beginPath();
+ ctx.arc(W*.5,earthY,earthR,Math.PI,Math.PI*2);
+ ctx.fill();
+
+ ctx.shadowBlur=0;
+
+ ctx.globalAlpha=.7;
+ ctx.strokeStyle="#2ff4ff";
+ ctx.lineWidth=2;
+
+ ctx.beginPath();
+ ctx.arc(W*.5,earthY,earthR,Math.PI*1.05,Math.PI*1.95);
+ ctx.stroke();
+
+ for(const cloud of earthState.clouds){
+  cloud.x-=cloud.speed*dt;
+
+  if(cloud.x+cloud.w<-20){
+   cloud.x=W+20;
+   cloud.y=H*.65+Math.random()*H*.26;
+  }
+
+  ctx.globalAlpha=cloud.alpha;
+  ctx.fillStyle="#c8f7ff";
+  ctx.shadowBlur=12;
+  ctx.shadowColor="#8cefff";
+
+  ctx.beginPath();
+  ctx.ellipse(cloud.x,cloud.y,cloud.w*.5,cloud.h,0,0,Math.PI*2);
+  ctx.fill();
+ }
+
+ ctx.shadowBlur=0;
+ ctx.globalAlpha=1;
+}
+
+function drawBackgroundSun(dt){
+ const gradient=ctx.createLinearGradient(0,0,W,H);
+
+ gradient.addColorStop(0,"#1c0716");
+ gradient.addColorStop(.54,"#090517");
+ gradient.addColorStop(1,"#02040e");
+
+ ctx.fillStyle=gradient;
+ ctx.fillRect(0,0,W,H);
+
+ for(const star of stars){
+  star.x-=dt*.04*star.v;
+
+  if(star.x<0){
+   star.x=1;
+  }
+
+  ctx.globalAlpha=.15+star.v*.35;
+  ctx.fillStyle="#fff0d5";
+
+  ctx.beginPath();
+  ctx.arc(star.x*W,star.y*H,star.s*.8,0,Math.PI*2);
+  ctx.fill();
+ }
+
+ const sx=W*.79+Math.sin(time*.22)*20;
+ const sy=H*.28+Math.cos(time*.18)*13;
+ const sr=Math.min(W,H)*.19;
+
+ ctx.globalAlpha=.1;
+ ctx.fillStyle="#ff6d2e";
+ ctx.shadowBlur=100;
+ ctx.shadowColor="#ff5125";
+
+ ctx.beginPath();
+ ctx.arc(sx,sy,sr*2.2,0,Math.PI*2);
+ ctx.fill();
+
+ for(const flare of sunState.flares){
+  flare.angle+=flare.speed*dt;
+
+  const distance=flare.dist+Math.sin(time*2+flare.phase)*14;
+  const fx=sx+Math.cos(flare.angle)*distance;
+  const fy=sy+Math.sin(flare.angle)*distance;
+
+  ctx.globalAlpha=.08+Math.sin(time*2+flare.phase)*.035;
+  ctx.fillStyle="#ffb53b";
+  ctx.shadowBlur=15;
+  ctx.shadowColor="#ff7a28";
+
+  ctx.beginPath();
+  ctx.arc(fx,fy,flare.size,0,Math.PI*2);
+  ctx.fill();
+ }
+
+ ctx.globalAlpha=.95;
+ ctx.shadowBlur=40;
+ ctx.shadowColor="#ff8a32";
+
+ const sunGradient=ctx.createRadialGradient(
+  sx-sr*.25,
+  sy-sr*.27,
+  sr*.08,
+  sx,
+  sy,
+  sr
+ );
+
+ sunGradient.addColorStop(0,"#fff9cf");
+ sunGradient.addColorStop(.38,"#ffd34c");
+ sunGradient.addColorStop(.72,"#ff8d2f");
+ sunGradient.addColorStop(1,"#d73c22");
+
+ ctx.fillStyle=sunGradient;
+
+ ctx.beginPath();
+ ctx.arc(sx,sy,sr,0,Math.PI*2);
+ ctx.fill();
+
+ ctx.shadowBlur=0;
+ ctx.globalAlpha=1;
+}
+
+function drawBackground(dt){
+ switch(selectedBackground){
+  case "solar":
+   drawBackgroundSolar(dt);
+   break;
+
+  case "earth":
+   drawBackgroundEarth(dt);
+   break;
+
+  case "sun":
+   drawBackgroundSun(dt);
+   break;
+
+  default:
+   drawBackgroundDefault(dt);
+ }
+}
+
+/* ════════════════════════════════════════
+   БОЧКА И БУСТ
+════════════════════════════════════════ */
+
+const barrel={
+ active:false,
+ timer:0,
+ clicks:0,
+ angle:0,
+ speed:0
+};
+
+const boostEffect={
+ active:false,
+ timer:0,
+ mult:1
+};
+
+let speedMultiplier=1;
+let lastSpeedTier=0;
+let nextBoostScore=30;
+
+function resetBarrel(){
+ barrel.active=false;
+ barrel.timer=0;
+ barrel.clicks=0;
+ barrel.angle=0;
+ barrel.speed=0;
+
+ barrelCountEl.textContent="0/10";
+}
+
+function activateBarrel(){
+ barrel.active=true;
+ barrel.timer=3;
+ barrel.clicks=0;
+ barrel.speed=Math.PI*2*3.5;
+
+ barrelCountEl.textContent="АКТИВ!";
+}
+
+function updateSpeedMultiplier(){
+ const tier=Math.floor(score/10);
+
+ if(tier>lastSpeedTier){
+  lastSpeedTier=tier;
+  speedMultiplier=Math.pow(1.1,tier);
+  speedLvlEl.textContent="×"+speedMultiplier.toFixed(2);
+ }
+}
+
+function resetBoost(){
+ boostItem=null;
+ boostEffect.active=false;
+ boostEffect.timer=0;
+ boostEffect.mult=1;
+ nextBoostScore=30;
+ turboLvlEl.textContent="—";
+}
+
+function spawnBoost(){
+ boostItem={
+  x:W+110,
+  y:95+Math.random()*(H-190),
+  r:24,
+  spawn:0
+ };
+}
+
+function collectBoost(){
+ score+=10;
+ scoreEl.textContent=score;
+
+ updateSpeedMultiplier();
+
+ burst(boostItem.x,boostItem.y,"#7ff2ff",28);
+
+ boostItem=null;
+
+ boostEffect.active=true;
+ boostEffect.timer=3;
+}
+
+/* ════════════════════════════════════════
+   МОНЕТЫ
+════════════════════════════════════════ */
 
 const COIN_VISUAL_R=28;
 const COIN_HITBOX_R=42;
 
-const barrel={
- clicks:0,
- active:false,
- timer:0,
- angle:0
-};
+let nextCoinScore=0;
 
-function resize(){
- DPR=Math.min(devicePixelRatio||1,2);
- W=innerWidth;
- H=innerHeight;
-
- canvas.width=W*DPR;
- canvas.height=H*DPR;
-
- ctx.setTransform(DPR,0,0,DPR,0,0);
- initBackgroundState();
-}
-
-addEventListener("resize",resize);
-
-function planeBox(){
- return{
-  l:plane.x-17,
-  r:plane.x+17,
-  t:plane.y-9,
-  b:plane.y+9
- };
-}
-
-function droneBox(drone){
- const y=drone.y+Math.sin(time*2+drone.phase)*12;
-
- return{
-  l:drone.x-21,
-  r:drone.x+21,
-  t:y-10,
-  b:y+10
- };
-}
-
-function intersects(a,b){
- return a.l<b.r&&a.r>b.l&&a.t<b.b&&a.b>b.t;
-}
-
-function addDrone(){
- drones.push({
-  x:W+70,
-  y:70+Math.random()*Math.max(50,H-140),
-  phase:Math.random()*Math.PI*2,
-  type:Math.floor(Math.random()*3),
-  passed:false
- });
-}
-
-function burst(x,y,color,count=25){
- for(let i=0;i<count;i++){
-  particles.push({
-   x,y,
-   vx:(Math.random()-.5)*360,
-   vy:(Math.random()-.5)*360,
-   life:.4+Math.random()*.5,
-   max:1,
-   size:1+Math.random()*4,
-   color
-  });
- }
-}
-
-function scheduleCoin(){
+function scheduleNextCoin(){
  nextCoinScore=score+3+Math.floor(Math.random()*5);
 }
 
 function spawnCoin(){
  coinItem={
-  x:W+80+Math.random()*130,
-  y:80+Math.random()*Math.max(40,H-160),
+  x:W+115,
+  y:95+Math.random()*(H-190),
   r:COIN_VISUAL_R,
-  alpha:0,
-  rot:0
+  rot:0,
+  spawn:0
  };
 }
 
@@ -1250,86 +1662,105 @@ function collectCoin(){
   reward
  );
 
- burst(coinItem.x,coinItem.y,"#ffd600",25);
+ burst(coinItem.x,coinItem.y,"#ffd600",22);
 
  coinItem=null;
- scheduleCoin();
+ scheduleNextCoin();
 }
 
-function drawCoin(){
- if(!coinItem)return;
+/* ════════════════════════════════════════
+   ДРОНЫ И ЧАСТИЦЫ
+════════════════════════════════════════ */
 
- const c=coinItem;
- const pulse=1+Math.sin(time*5)*.08;
-
- ctx.save();
- ctx.translate(c.x,c.y);
- ctx.rotate(c.rot);
- ctx.scale(c.alpha*pulse,c.alpha);
-
- ctx.globalAlpha=.25;
- ctx.fillStyle="#ffd600";
- ctx.shadowBlur=0;
-
- ctx.beginPath();
- ctx.arc(0,0,c.r*1.7,0,Math.PI*2);
- ctx.fill();
-
- ctx.globalAlpha=1;
- ctx.shadowBlur=24;
- ctx.shadowColor="#ffd600";
-
- const gradient=ctx.createRadialGradient(
-  -c.r*.3,-c.r*.3,c.r*.1,
-  0,0,c.r
- );
-
- gradient.addColorStop(0,"#fffbd0");
- gradient.addColorStop(.5,"#ffd600");
- gradient.addColorStop(1,"#a87800");
-
- ctx.fillStyle=gradient;
-
- ctx.beginPath();
- ctx.arc(0,0,c.r,0,Math.PI*2);
- ctx.fill();
-
- ctx.fillStyle="#765500";
- ctx.font="bold "+c.r*1.1+"px Arial";
- ctx.textAlign="center";
- ctx.textBaseline="middle";
- ctx.fillText("$",0,1);
-
- ctx.restore();
+function addDrone(){
+ drones.push({
+  x:W+80,
+  y:85+Math.random()*(H-170),
+  type:Math.floor(Math.random()*3),
+  phase:Math.random()*Math.PI*2,
+  hitW:22,
+  hitH:10,
+  passed:false
+ });
 }
+
+function planeBox(){
+ return{
+  l:plane.x-17,
+  r:plane.x+17,
+  t:plane.y-8,
+  b:plane.y+8
+ };
+}
+
+function droneBox(drone){
+ const y=drone.y+Math.sin(time*2+drone.phase)*14;
+
+ return{
+  l:drone.x-drone.hitW,
+  r:drone.x+drone.hitW,
+  t:y-drone.hitH,
+  b:y+drone.hitH
+ };
+}
+
+function isHit(a,b){
+ return a.l<b.r&&a.r>b.l&&a.t<b.b&&a.b>b.t;
+}
+
+function burst(x,y,color="#ff3f91",count=35){
+ for(let i=0;i<count;i++){
+  particles.push({
+   x,
+   y,
+   vx:(Math.random()-.5)*400,
+   vy:(Math.random()-.5)*400,
+   life:.35+Math.random()*.6,
+   max:1,
+   size:1+Math.random()*3,
+   color
+  });
+ }
+}
+
+/* ════════════════════════════════════════
+   ОТРИСОВКА ОБЪЕКТОВ
+════════════════════════════════════════ */
 
 function drawDrone(drone){
- const y=drone.y+Math.sin(time*2+drone.phase)*12;
- const color=drone.type===0?"#ff3f91":drone.type===1?"#9d6cff":"#00eaff";
+ const y=drone.y+Math.sin(time*2+drone.phase)*14;
+
+ const glow=
+  drone.type===0
+   ?"#ff3f91"
+   :drone.type===1
+    ?"#8b7cff"
+    :"#00eaff";
 
  ctx.save();
  ctx.translate(drone.x,y);
+
  ctx.shadowBlur=20;
- ctx.shadowColor=color;
- ctx.strokeStyle=color;
- ctx.fillStyle="#101b35";
+ ctx.shadowColor=glow;
+ ctx.strokeStyle=glow;
+ ctx.lineWidth=3;
+
+ ctx.beginPath();
+ ctx.moveTo(-28,0);
+ ctx.lineTo(28,0);
+ ctx.stroke();
+
+ ctx.fillStyle="#101a31";
+ ctx.strokeStyle=glow;
  ctx.lineWidth=2;
 
  ctx.beginPath();
- ctx.roundRect(-27,-12,54,24,7);
+ ctx.roundRect(-26,-11,52,22,7);
  ctx.fill();
  ctx.stroke();
 
- ctx.beginPath();
- ctx.moveTo(-25,-5);
- ctx.lineTo(-38,0);
- ctx.lineTo(-25,5);
- ctx.moveTo(25,-5);
- ctx.lineTo(38,0);
- ctx.lineTo(25,5);
- ctx.stroke();
+ ctx.fillStyle=glow;
 
- ctx.fillStyle=color;
  ctx.beginPath();
  ctx.arc(0,0,4,0,Math.PI*2);
  ctx.fill();
@@ -1337,102 +1768,162 @@ function drawDrone(drone){
  ctx.restore();
 }
 
-function updateTrail(dt,worldSpeed){
- if(selectedTail==="none"){
-  trailPoints=[];
-  return;
- }
-
- trailTimer-=dt;
-
- if(trailTimer<=0){
-  trailTimer=.025;
-
-  trailPoints.push({
-   x:plane.x-26,
-   y:plane.y,
-   age:0,
-   hue:(time*100)%360
-  });
- }
-
- const shift=(285+Math.min(score*2,130))*worldSpeed*dt;
-
- for(const point of trailPoints){
-  point.age+=dt;
-  point.x-=shift;
- }
-
- trailPoints=trailPoints.filter(point=>{
-  return point.age<1&&point.x>-100;
- });
-}
-
-function tailColor(point){
- if(selectedTail==="rainbow"){
-  return `hsl(${(point.hue+time*80)%360},100%,60%)`;
- }
-
- return TAILS[selectedTail].accent;
-}
-
-function drawTrail(){
- if(selectedTail==="none"||trailPoints.length<2)return;
+function drawCoin(){
+ const pulse=1+Math.sin(time*5)*.08;
+ const scale=coinItem.spawn*pulse;
 
  ctx.save();
- ctx.lineCap="round";
- ctx.lineJoin="round";
 
- for(let i=1;i<trailPoints.length;i++){
-  const a=trailPoints[i-1];
-  const b=trailPoints[i];
+ ctx.translate(coinItem.x,coinItem.y);
+ ctx.rotate(coinItem.rot);
+ ctx.scale(
+  scale*Math.max(.2,Math.abs(Math.cos(coinItem.rot*1.55))),
+  scale
+ );
 
-  const life=Math.max(0,1-b.age);
-  const alpha=Math.pow(life,1.5);
-  const color=tailColor(b);
+ ctx.globalAlpha=coinItem.spawn*.34;
+ ctx.fillStyle="#ffd600";
 
-  ctx.globalAlpha=alpha;
-  ctx.strokeStyle=color;
-  ctx.shadowBlur=20;
-  ctx.shadowColor=color;
-  ctx.lineWidth=2+life*12;
+ ctx.beginPath();
+ ctx.arc(0,0,coinItem.r*1.65,0,Math.PI*2);
+ ctx.fill();
 
-  ctx.beginPath();
-  ctx.moveTo(a.x,a.y);
-  ctx.lineTo(b.x,b.y);
-  ctx.stroke();
- }
+ ctx.globalAlpha=coinItem.spawn;
+ ctx.shadowBlur=24;
+ ctx.shadowColor="#ffd600";
+
+ const gradient=ctx.createRadialGradient(
+  -coinItem.r*.3,
+  -coinItem.r*.3,
+  coinItem.r*.1,
+  0,
+  0,
+  coinItem.r
+ );
+
+ gradient.addColorStop(0,"#fff7d6");
+ gradient.addColorStop(.5,"#ffd600");
+ gradient.addColorStop(1,"#bb8600");
+
+ ctx.fillStyle=gradient;
+
+ ctx.beginPath();
+ ctx.arc(0,0,coinItem.r,0,Math.PI*2);
+ ctx.fill();
+
+ ctx.shadowBlur=0;
+ ctx.fillStyle="#795400";
+ ctx.font="bold 30px Arial";
+ ctx.textAlign="center";
+ ctx.textBaseline="middle";
+ ctx.fillText("$",0,1);
+
+ ctx.restore();
+}
+
+function drawBoost(){
+ const scale=boostItem.spawn*(1+Math.sin(time*4)*.06);
+
+ ctx.save();
+
+ ctx.translate(boostItem.x,boostItem.y);
+ ctx.scale(scale,scale);
+
+ ctx.globalAlpha=.3;
+ ctx.fillStyle="#58f4ff";
+
+ ctx.beginPath();
+ ctx.arc(0,0,boostItem.r*1.6,0,Math.PI*2);
+ ctx.fill();
+
+ ctx.globalAlpha=1;
+ ctx.shadowBlur=28;
+ ctx.shadowColor="#5af6ff";
+
+ const gradient=ctx.createRadialGradient(
+  -7,
+  -8,
+  2,
+  0,
+  0,
+  boostItem.r
+ );
+
+ gradient.addColorStop(0,"#efffff");
+ gradient.addColorStop(.5,"#72f4ff");
+ gradient.addColorStop(1,"#00a9d3");
+
+ ctx.fillStyle=gradient;
+
+ ctx.beginPath();
+ ctx.arc(0,0,boostItem.r,0,Math.PI*2);
+ ctx.fill();
 
  ctx.restore();
 }
 
 function drawPlane(){
- const color=COLORS[selectedColor];
+ const color=PLANE_COLORS[selectedPlaneColor]||PLANE_COLORS.white;
+
+ let top=color.top;
+ let glow=color.glow;
+ let scaleY=1;
+
+ if(barrel.active){
+  scaleY=Math.abs(Math.cos(barrel.angle));
+
+  if(Math.cos(barrel.angle)<0){
+   top="#ffbc4a";
+   glow="#ff762c";
+  }
+ }
+
+ if(boostEffect.active&&!barrel.active){
+  glow="#7ff2ff";
+ }
 
  ctx.save();
- ctx.translate(plane.x,plane.y);
- ctx.rotate(plane.rot);
 
- ctx.shadowBlur=24;
- ctx.shadowColor=color.accent;
- ctx.fillStyle=color.color;
- ctx.strokeStyle=color.accent;
+ ctx.translate(plane.x,plane.y);
+ ctx.scale(1,scaleY);
+ ctx.rotate(plane.rot*(1-scaleY*.55));
+
+ ctx.shadowBlur=25;
+ ctx.shadowColor=glow;
+
+ const flame=ctx.createLinearGradient(-45,0,-5,0);
+
+ flame.addColorStop(0,"transparent");
+ flame.addColorStop(1,glow);
+
+ ctx.fillStyle=flame;
+
+ ctx.beginPath();
+ ctx.moveTo(-46,0);
+ ctx.lineTo(-5,-5);
+ ctx.lineTo(-5,5);
+ ctx.closePath();
+ ctx.fill();
+
+ ctx.fillStyle=top;
+ ctx.strokeStyle=glow;
  ctx.lineWidth=2;
 
  ctx.beginPath();
- ctx.moveTo(35,0);
- ctx.lineTo(-10,-9);
- ctx.lineTo(-25,-21);
+ ctx.moveTo(34,0);
+ ctx.lineTo(-9,-9);
+ ctx.lineTo(-24,-22);
  ctx.lineTo(-21,-5);
- ctx.lineTo(-37,0);
- ctx.lineTo(-21,5);
- ctx.lineTo(-25,21);
- ctx.lineTo(-10,9);
+ ctx.lineTo(-36,-1);
+ ctx.lineTo(-21,4);
+ ctx.lineTo(-24,22);
+ ctx.lineTo(-9,9);
  ctx.closePath();
  ctx.fill();
  ctx.stroke();
 
  ctx.fillStyle="#8b7cff";
+
  ctx.beginPath();
  ctx.ellipse(8,0,8,4,0,0,Math.PI*2);
  ctx.fill();
@@ -1440,60 +1931,74 @@ function drawPlane(){
  ctx.restore();
 }
 
-/* ══════════════ Игровая логика ══════════════ */
+/* ════════════════════════════════════════
+   ИГРОВОЙ ЦИКЛ
+════════════════════════════════════════ */
 
 function resetGame(){
  score=0;
- speedMultiplier=1;
- lastSpeedLevel=0;
- spawnTimer=.8;
+ scoreEl.textContent=score;
+
  time=0;
+ shake=0;
+ spawnTimer=.9;
 
  drones=[];
  particles=[];
  coinItem=null;
- trailPoints=[];
- trailTimer=0;
+ boostItem=null;
 
  plane.x=W*.22;
  plane.y=H*.5;
  plane.vy=0;
  plane.rot=0;
 
- barrel.clicks=0;
- barrel.active=false;
- barrel.timer=0;
- barrel.angle=0;
+ speedMultiplier=1;
+ lastSpeedTier=0;
+ speedLvlEl.textContent="×1.00";
 
- speedHUD.textContent="×1.00";
- barrelHUD.textContent="0/10";
+ resetTrail();
+ resetBarrel();
+ resetBoost();
 
- scheduleCoin();
- initBackgroundState();
+ scheduleNextCoin();
 }
 
 function flap(){
- if(!playing)return;
+ if(!playing){
+  return;
+ }
 
  plane.vy=-430;
 
- burst(plane.x-20,plane.y,"#00eaff",5);
+ for(let i=0;i<5;i++){
+  particles.push({
+   x:plane.x-18,
+   y:plane.y,
+   vx:-90-Math.random()*80,
+   vy:(Math.random()-.5)*70,
+   life:.3,
+   max:.3,
+   size:1+Math.random()*2,
+   color:"#00eaff"
+  });
+ }
 
  if(!barrel.active){
   barrel.clicks++;
+  barrelCountEl.textContent=barrel.clicks+"/10";
 
   if(barrel.clicks>=10){
-   barrel.active=true;
-   barrel.timer=3;
-   barrel.clicks=0;
+   activateBarrel();
   }
-
-  barrelHUD.textContent=barrel.active?"АКТИВ!":barrel.clicks+"/10";
  }
 }
 
 function gameOver(){
  playing=false;
+ shake=13;
+
+ burst(plane.x,plane.y,"#ff3f91",42);
 
  if(score>best){
   best=score;
@@ -1502,168 +2007,49 @@ function gameOver(){
  }
 
  title.textContent="MISSION FAILED";
- subtitle.textContent="Счёт: "+score+" • Рекорд: "+best;
- startButton.textContent="Повторить ✈️";
+ subtitle.textContent=`Счёт: ${score} • Рекорд: ${best}`;
+ startBtn.textContent="ПОВТОРИТЬ ✈️";
 
  document.querySelector('[data-tab="main"]').click();
+
  overlay.classList.remove("hidden");
 }
 
-function startGame(){
+function beginGame(){
  resetGame();
  playing=true;
  overlay.classList.add("hidden");
 }
 
-startButton.onclick=startGame;
-
-addEventListener("pointerdown",()=>{
- if(overlay.classList.contains("hidden"))flap();
-});
-
-addEventListener("keydown",event=>{
- if(["Space","ArrowUp","KeyW"].includes(event.code)){
-  event.preventDefault();
-
-  if(playing)flap();
-  else startGame();
- }
-});
-
 function update(dt){
  time+=dt;
- bgTime+=dt;
-
- const worldSpeed=speedMultiplier;
- const scroll=(285+Math.min(score*2,130))*worldSpeed;
-
- plane.vy+=1000*dt;
- plane.y+=plane.vy*dt;
- plane.rot=Math.max(-.55,Math.min(.8,plane.vy/700));
 
  if(barrel.active){
   barrel.timer-=dt;
-  barrel.angle+=dt*20;
+  barrel.angle+=barrel.speed*dt;
+
+  if(barrel.timer<=.4){
+   barrel.speed+=(0-barrel.speed)*5*dt;
+  }
 
   if(barrel.timer<=0){
    barrel.active=false;
    barrel.angle=0;
-   barrelHUD.textContent="0/10";
+   barrel.speed=0;
+   barrel.clicks=0;
+   barrelCountEl.textContent="0/10";
   }
  }
 
- spawnTimer-=dt;
+ if(boostEffect.active){
+  boostEffect.timer-=dt;
 
- if(spawnTimer<=0){
-  addDrone();
-  spawnTimer=Math.max(.7,1.2-score*.005);
- }
+  const fadeIn=Math.min(1,(3-boostEffect.timer)/.4);
+  const fadeOut=boostEffect.timer<.55?boostEffect.timer/.55:1;
 
- for(const drone of drones){
-  drone.x-=scroll*dt;
+  boostEffect.mult=1+.5*fadeIn*fadeOut;
 
-  if(!drone.passed&&drone.x<plane.x){
-   drone.passed=true;
-   score++;
-   scoreEl.textContent=score;
+  turboLvlEl.textContent=Math.max(0,boostEffect.timer).toFixed(1)+"s";
 
-   const level=Math.floor(score/10);
-
-   if(level>lastSpeedLevel){
-    lastSpeedLevel=level;
-    speedMultiplier=Math.pow(1.1,level);
-    speedHUD.textContent="×"+speedMultiplier.toFixed(2);
-   }
-  }
-
-  if(!barrel.active&&intersects(planeBox(),droneBox(drone))){
-   gameOver();
-   return;
-  }
- }
-
- drones=drones.filter(drone=>drone.x>-100);
-
- if(!coinItem&&score>=nextCoinScore){
-  spawnCoin();
- }
-
- if(coinItem){
-  coinItem.alpha=Math.min(1,coinItem.alpha+dt*3);
-  coinItem.rot+=dt*3;
-  coinItem.x-=scroll*dt;
-
-  const dx=plane.x-coinItem.x;
-  const dy=plane.y-coinItem.y;
-
-  if(Math.hypot(dx,dy)<COIN_HITBOX_R){
-   collectCoin();
-  }else if(coinItem&&coinItem.x<-80){
-   coinItem=null;
-   scheduleCoin();
-  }
- }
-
- updateTrail(dt,worldSpeed);
-
- for(const particle of particles){
-  particle.x+=particle.vx*dt;
-  particle.y+=particle.vy*dt;
-  particle.vy+=180*dt;
-  particle.life-=dt;
- }
-
- particles=particles.filter(p=>p.life>0);
-
- if(!barrel.active&&(plane.y<15||plane.y>H-15)){
-  gameOver();
- }
-}
-
-function draw(){
- drawBackground(.016);
-
- for(const drone of drones)drawDrone(drone);
-
- drawTrail();
- drawCoin();
-
- for(const particle of particles){
-  ctx.globalAlpha=Math.max(0,particle.life/particle.max);
-  ctx.fillStyle=particle.color;
-  ctx.shadowBlur=10;
-  ctx.shadowColor=particle.color;
-
-  ctx.beginPath();
-  ctx.arc(
-   particle.x,
-   particle.y,
-   particle.size,
-   0,
-   Math.PI*2
-  );
-  ctx.fill();
- }
-
- ctx.globalAlpha=1;
- ctx.shadowBlur=0;
-
- drawPlane();
-}
-
-function loop(now){
- const dt=Math.min(.033,(now-lastTime)/1000||0);
- lastTime=now;
-
- if(playing)update(dt);
-
- draw();
- requestAnimationFrame(loop);
-}
-
-resize();
-requestAnimationFrame(loop);
-</script>
-
-</body>
-</html>
+  if(boostEffect.timer<=0){
+   boostEffect.active=false
